@@ -2,14 +2,14 @@ baseURL = "https://www.lnjstudios.com/"
 title = "Links & Joints Studios"
 defaultContentLanguage = "en"
 
+[build]
+  useResourceCacheWhen = "fallback"
+[build.processing]
+  css = true
 
 # Theme Config
 theme = "hugo-saasify-theme"
-
-# Enable emoji support
 enableEmoji = true
-
-# Enable Git info for lastmod
 enableGitInfo = true
 
 # Enable taxonomies

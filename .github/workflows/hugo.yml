@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.120.0
+      HUGO_VERSION: 0.152.2
     steps:
       - name: Install Hugo CLI
         run: |
@@ -44,6 +44,7 @@ jobs:
           cp themes/hugo-saasify-theme/postcss.config.js .
           cp themes/hugo-saasify-theme/tailwind.config.copy.js ./tailwind.config.js
           npm install
+          npm install -D postcss postcss-cli autoprefixer
 
       - name: Build with Hugo
         env:

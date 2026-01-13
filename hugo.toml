@@ -2,11 +2,6 @@ baseURL = "https://www.lnjstudios.com/"
 title = "Links & Joints Studios"
 defaultContentLanguage = "en"
 
-[build]
-  useResourceCacheWhen = "fallback"
-[build.processing]
-  css = true
-
 # Theme Config
 theme = "hugo-saasify-theme"
 enableEmoji = true
@@ -146,6 +141,9 @@ paginatePath = "page"
 
 [build]
   writeStats = true
+  useResourceCacheWhen = "fallback"
+[build.processing]
+  css = true
 
 [build.buildStats]
   enable = true

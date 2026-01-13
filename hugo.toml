@@ -1,9 +1,7 @@
-baseURL = "https://saasify-demo.chaoming.li/"
+baseURL = "https://www.lnjstudios.com/"
 title = "Links & Joints Studios"
 defaultContentLanguage = "en"
 
-# Copyright text
-copyright = "© 2025 Lincfewfwefewfewfwfs and Joints. All rights reserved."
 
 # Theme Config
 theme = "hugo-saasify-theme"

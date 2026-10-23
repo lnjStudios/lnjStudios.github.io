@@ -22,7 +22,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.152.2
+      # Keep in step with the local Hugo (snap, held): `hugo version`
+      HUGO_VERSION: 0.168.0
     steps:
       - name: Install Hugo CLI
         run: |
@@ -33,27 +34,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0  # .GitInfo / lastmod
 
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
-      - name: Install Node.js dependencies
-        run: |
-          cp themes/hugo-saasify-theme/package.json .
-          cp themes/hugo-saasify-theme/postcss.config.js .
-          cp themes/hugo-saasify-theme/tailwind.config.copy.js ./tailwind.config.js
-          npm install
-          npm install -D postcss postcss-cli autoprefixer
-
-      - name: Build with Hugo
+      - name: Build site
         env:
           HUGO_ENVIRONMENT: production
-          HUGO_ENV: production
-        run: |
-          hugo \
-            --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
+        run: hugo --gc --minify --cleanDestinationDir
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

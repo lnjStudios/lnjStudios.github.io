@@ -1,0 +1,127 @@
+{{- /*
+    About page (content/about.md, `layout: about`): not the article layout. A hero (headline, subtitle, and an
+    AMR tearing along), the story (the page's own text), cards for
+    what's on the site (`explore`), the person at the bench (`person`: photo, name and role from their author
+    page (content/author/<id>/); title, a one-line bio and contact from here) and the writing guide (`write`). Styles in custom.css ("About / résumé pages").
+*/ -}}
+{{- define "main" }}
+{{- $svg := `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"` | safeHTMLAttr }}
+{{- $icons := dict
+    "gear" `<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/>`
+    "notes" `<path d="M4 4h12l4 4v12H4z"/><path d="M8 11h8M8 15h8M8 7h4"/>`
+    "pen" `<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>`
+    "arrow" `<path d="M5 12h14M13 6l6 6-6 6"/>`
+}}
+<article id="lnj-about" class="lnj-page pagewidth">
+    <header class="lnj-hero">
+        <div class="lnj-hero__text">
+            <p class="lnj-kicker">About</p>
+            <h1 class="lnj-hero__title" id="title">{{ .Params.headline | default .Title }}</h1>
+            {{- with .Params.subtitle }}<p class="lnj-hero__sub">{{ . }}</p>{{ end }}
+        </div>
+        {{- /* an AMR at full tilt: the road and speed lines stream past, wheels spin, the lidar pings ahead, the
+               body surges, pitches back on the throttle and dips on the brakes. Clicking it starts the
+               site-wide "vroom" Easter egg (assets/js/lnj-amr.js). Kept in assets/svg/: the old two-link arm, and a copy of this one. */}}
+        <svg class="lnj-hero__art lnj-amr" viewBox="0 0 240 200" aria-hidden="true">
+            <path class="lnj-amr__road" d="M0 171h240"/>
+            <g class="lnj-amr__trail">
+                <path d="M14 114h40"/>
+                <path d="M2 130h46"/>
+                <path d="M22 146h30"/>
+            </g>
+            <g class="lnj-amr__bot">
+                <g class="lnj-amr__dust">
+                    <circle cx="70" cy="164" r="4"/>
+                    <circle cx="62" cy="160" r="3"/>
+                </g>
+                <g class="lnj-amr__pitch">
+                    <g class="lnj-amr__scan">
+                        <path d="M190 98 226 83M190 98h36M190 98l36 15"/>
+                    </g>
+                    <path class="lnj-amr__deck" d="M90 106V93h58v13"/>
+                    <rect class="lnj-amr__body" x="66" y="106" width="134" height="42" rx="13"/>
+                    <rect class="lnj-amr__lidar" x="180" y="90" width="20" height="16" rx="4"/>
+                    <path class="lnj-amr__led" d="M84 127h34"/>
+                </g>
+                {{- range slice 98 166 }}
+                    <g class="lnj-amr__wheel" style="transform-origin: {{ . }}px 154px">
+                        <circle class="lnj-amr__tyre" cx="{{ . }}" cy="154" r="15"/>
+                        <path class="lnj-amr__spokes" d="M{{ . }} 143v22M{{ sub . 11 }} 154h22"/>
+                        <circle class="lnj-amr__hub" cx="{{ . }}" cy="154" r="5"/>
+                    </g>
+                {{- end }}
+            </g>
+        </svg>
+    </header>
+
+    <section class="lnj-page__prose">
+        {{ .Content }}
+    </section>
+
+    {{- with .Params.explore }}
+        <section class="lnj-page__section" aria-labelledby="lnj-explore">
+            <h2 class="lnj-section-title" id="lnj-explore">What you'll find here</h2>
+            <div class="lnj-cards">
+                {{- range . }}
+                    {{- $ext := hasPrefix .url "http" }}
+                    <a class="lnj-card" href="{{ .url }}" {{ if $ext }}target="_blank" rel="noopener noreferrer"{{ end }}>
+                        <span class="lnj-card__icon" aria-hidden="true">
+                            {{- if eq .icon "docs" }}<span class="lnj-docs__logo"></span>
+                            {{- else if eq .icon "youtube" }}<i class="icon youtube"></i>
+                            {{- else }}<svg {{ $svg }}>{{ index $icons .icon | safeHTML }}</svg>{{ end -}}
+                        </span>
+                        <span class="lnj-card__title">{{ .title }}</span>
+                        <span class="lnj-card__text">{{ .text }}</span>
+                        <svg class="lnj-card__go" {{ $svg }}>{{ index $icons "arrow" | safeHTML }}</svg>
+                    </a>
+                {{- end }}
+            </div>
+        </section>
+    {{- end }}
+
+    {{- with .Params.person }}
+        {{- $p := site.GetPage .page }}
+        <section class="lnj-page__section" aria-labelledby="lnj-person">
+            <h2 class="lnj-section-title" id="lnj-person">{{ .title | default "At the bench" }}</h2>
+            <div class="lnj-person">
+                {{- with $p }}
+                    {{- with .Resources.Get .Params.photo }}
+                        <a class="lnj-person__photo" href="{{ $p.RelPermalink }}" tabindex="-1" aria-hidden="true">
+                            <img src="{{ (.Resize "480x webp q85").RelPermalink }}" alt="" width="240" height="240" loading="lazy">
+                        </a>
+                    {{- end }}
+                {{- end }}
+                <div class="lnj-person__body">
+                    {{- with $p }}
+                        <p class="lnj-person__name">{{ .Title }}</p>
+                        {{- with .Params.role }}<p class="lnj-person__role">{{ . }}</p>{{ end }}
+                    {{- end }}
+                    {{- with .bio }}<p class="lnj-person__bio">{{ . | markdownify }}</p>{{ end }}
+                    <div class="lnj-person__actions">
+                        {{- with $p }}
+                            <a class="lnj-btn lnj-btn--accent" href="{{ .RelPermalink }}">About {{ index (split .Title " ") 0 }}
+                                <svg {{ $svg }}>{{ index $icons "arrow" | safeHTML }}</svg></a>
+                        {{- end }}
+                        {{- range .contact }}
+                            <a class="lnj-btn lnj-btn--icon" href="{{ .url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .label }}"><i class="icon {{ .icon }}" aria-hidden="true"></i></a>
+                        {{- end }}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {{- end }}
+
+    {{- with .Params.write }}
+        {{- with site.GetPage .page }}
+            <section class="lnj-page__section">
+                <a class="lnj-card lnj-card--wide" href="{{ .RelPermalink }}">
+                    <span class="lnj-card__icon" aria-hidden="true"><svg {{ $svg }}>{{ index $icons "pen" | safeHTML }}</svg></span>
+                    <span class="lnj-card__title">{{ $.Params.write.title | default .Title }}</span>
+                    <span class="lnj-card__text">{{ $.Params.write.text | default .Description }}</span>
+                    <span class="lnj-card__cta">Read the guide <svg {{ $svg }}>{{ index $icons "arrow" | safeHTML }}</svg></span>
+                </a>
+            </section>
+        {{- end }}
+    {{- end }}
+</article>
+{{- end }}

@@ -1,0 +1,8 @@
+# Overrides of hugo-brewm's English strings (themes/hugo-brewm/i18n/en.toml); only keys listed here change.
+# Short Settings switch labels: they share one row in the panel (assets/css/custom.css, .lnj-a11y-switches).
+[optimizeSR]
+    other = "Reading mode"
+[OpenDyslexic]
+    other = "Dyslexic"
+[bionRead]
+    other = "BionRead"

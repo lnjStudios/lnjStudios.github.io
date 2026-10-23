@@ -1,0 +1,29 @@
+name: Request a guide
+description: Ask for a step-by-step guide on Links & Docs.
+title: "Guide request: "
+labels: ["guide request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for asking! Tell me what you're trying to build or fix. The most-requested guides get written first.
+  - type: input
+    id: topic
+    attributes:
+      label: What should the guide cover?
+      placeholder: e.g. micro-ROS over Wi-Fi on an ESP32-S3
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: What have you tried, and where did you get stuck?
+      description: Your hardware, ROS 2 distro and Ubuntu version help a lot.
+  - type: dropdown
+    id: level
+    attributes:
+      label: How comfortable are you with this area?
+      options:
+        - Just starting out
+        - I know the basics
+        - I'm experienced, just stuck on this one thing

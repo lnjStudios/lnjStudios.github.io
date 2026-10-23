@@ -1,266 +1,182 @@
-baseURL = "https://lnjstudios.com/"
-title = "Links & Joints Studios"
-defaultContentLanguage = "en"
-
-# Theme Config
-theme = "hugo-saasify-theme"
-enableEmoji = true
+baseURL = 'https://lnjstudios.com/'
+locale = 'en-IN'
+defaultContentLanguage = 'en'
+defaultContentLanguageInSubdir = false
+title = 'Links & Joints Studios'
+theme = 'hugo-brewm'
+enableRobotsTXT = true
 enableGitInfo = true
+ignoreFiles = ['\.redacted$', '\.old$', '\.bak$', '\.tmp$', '\.swp$', '\.DS_Store$']
 
-# Enable taxonomies
-[taxonomies]
-  category = 'categories'
-  tag = 'tags'
-
-# Pagination
-paginate = 6
-paginatePath = "page"
-
-[params]
-  description = "Welcome to Links & Joints - Your Ultimate Resource for Robotics and Automation!"
-  author = "Koustav Betal"
-  logo = "/images/lnj.png"
-  # Google Analytics ID (e.g., "G-XXXXXXXXXX")
-  # googleAnalytics = "G-XXXXXXXXXX"
-  
-  # Global CTA Configuration
-  [params.cta]
-    enable = false
-    title = "Ready to Build Your SaaS Website?"
-    description = "Join companies already using our theme to create beautiful, high-performance websites."
-    gradient_from = "#2563eb"  # Indigo-600
-    gradient_to = "#7c3aed"    # Purple-600
-    gradient_angle = 30
-    [params.cta.primary_button]
-      text = "Get Started Free"
-      url = "/get-started"
-    [params.cta.secondary_button]
-      text = "Book Demo"
-      url = "/demo"
-  
-  # Social Media Links
-  [params.social]
-    linkedin = "https://linkedin.com/in/koustavbetal"
-    twitter = "https://x.com/koustavbetal"
-    youtube = "https://youtube.com/@linksnjoints"
-    instagram = "https://instagram.com/koustavbetal"
-    github = "https://github.com/koustavbetal"
-    telegram = "https://t.me/yourchannel"
-    discord = "https://discord.gg/yourinvite"
-    # medium = "https://medium.com/@yourhandle"
-    # behance = "https://behance.net/yourprofile"
-  
-  # Footer Configuration
-  [params.footer]
-    column_1_title = "Featured"
-    column_2_title = "COMPANY"
-    column_3_title = "LEGAL"
-  
-  [params.header]
-    # Header background and border styles (optional)
-    background = "bg-white/80 backdrop-blur-sm"
-    border = "border-b border-gray-100"
-    
-    # Logo configuration
-    [params.header.logo]
-      src = "/images/lnj.png"
-    
-    # Menu configuration
-    [params.header.menu]
-      spacing = "space-x-8"
-      
-      # Dropdown menu configuration
-      [params.header.menu.dropdown]
-        width = "w-72"
-        container_padding = "py-6"
-        item_padding = "px-4 py-2"
-        background = "bg-white"
-        border = "border border-gray-100"
-        shadow = "shadow-xl"
-        radius = "rounded-lg"
-        text_color = "text-gray-700"
-        hover_background = "hover:bg-gray-50"
-        text_size = "text-sm"
-    
-    # Button configuration
-    [params.header.buttons]
-      # Sign In button
-      [params.header.buttons.signIn]
-        text = "About Us"
-        url = "/company"
-      
-      # Get Started button
-      # [params.header.buttons.getStarted]
-      #   text = "Get Started"
-      #   url = "/get-started"
-
-  # Blog configuration
-  [params.blog]
-    enable = true
-    title = "Latest Articles"
-    subtitle = "Learn more about web development and best practices"
-    
-    # Blog CTA configuration
-    [params.blog.cta]
-      enable = false  # Enable/disable CTA in blog posts
-    
-    # Sidebar configuration
-    [params.blog.sidebar]
-      # Recent articles section
-      [params.blog.sidebar.recent]
-        enable = true
-        title = "Recent Articles"
-        count = 5
-      
-      # Categories section
-      [params.blog.sidebar.categories]
-        enable = true
-        title = "Categories"
-      
-      # Tags section
-      [params.blog.sidebar.tags]
-        enable = true
-        title = "Popular Tags"
-        count = 20
-
-      # Subscribe form section
-      [params.blog.sidebar.subscribe]
-        enable = true
-        title = "Subscribe to Newsletter"
-        description = "Get the latest posts delivered right to your inbox"
-        action = "https://formspree.io/f/your-form-id"
-        emailName = "email"
-        buttonText = "Subscribe"
-        placeholder = "Enter your email"
-        disclaimer = "We respect your privacy. Unsubscribe at any time."
-
-[module]
-  [module.hugoVersion]
-    extended = true
-    min = "0.80.0"
-
-[build]
-  writeStats = true
-  useResourceCacheWhen = "fallback"
-[build.processing]
-  css = true
-
-[build.buildStats]
-  enable = true
-
-[security.funcs]
-  getenv = ['^HUGO_', '^CI$']
+[frontmatter]
+	date = [':default']
+	# no ':git': it would make every post "Updated <commit day>" (all were first committed on the same day).
+	# Set `lastmod:` in a post's front matter when it's really edited; the byline then shows "Updated <date>"
+	lastmod = ['lastmod', 'date']
 
 [markup]
-  [markup.highlight]
-    noClasses = false
-    lineNos = true
-    codeFences = true
-    guessSyntax = true
-    lineNumbersInTable = true
-  [markup.goldmark.renderer]
-    unsafe = true
-  [markup.tableOfContents]
-    endLevel = 3
-    ordered = false
-    startLevel = 2
+	[markup.tableOfContents]
+		startLevel = 2
+		endLevel = 3
+		ordered = false
+	[markup.highlight]
+		codeFences = true
+		lineNos = false
+		noClasses = false
+		tabWidth = 4
+	[markup.goldmark.renderer]
+		unsafe = true
 
-# Multilingual Configuration
-# Uncomment the sections below to enable multilingual support
-# See docs/CONFIGURATION.md for detailed instructions
+[outputs]
+	home = ['html', 'rss', 'json']
 
-# [languages]
-#   [languages.en]
-#     languageCode = "en-us"
-#     languageName = "English"
-#     title = "Saasify"
-#     weight = 1
-#     contentDir = "content"
-#
-#   [languages.zh-cn]
-#     languageCode = "zh-cn"
-#     languageName = "简体中文"
-#     title = "Saasify"
-#     weight = 2
-#     contentDir = "content/zh-cn"
+[services.rss]
+	limit = 20
 
-# Navigation Menu
-[menu]
-  [[menu.main]] #featured just like trailers for docs and projects
-    name = "Featured"
-    url = "/featured"
-    weight = 1
-  [[menu.main]] #articles are related to company statements
-    name = "Articles"
-    url = "/articles"
-    weight = 2
-  [[menu.main]]
-    name = "Links & Docs"
-    # url = "https://docs.lnjstudios.com/"
-    weight = 3
-    [menu.main.params]
-      has_submenu = true
-      submenu = [
-        { name = "Docs", url = "https://docs.lnjstudios.com/docs/" },
-        { name = "Guides", url = "https://docs.lnjstudios.com/guides/" },
-      ]
-  [[menu.main]]
-    name = "Artphilic Store"
-    url = "https://artphilic.lnjstudios.com/"
-    weight = 4
-  # [[menu.main]]
-  #   name = "Blog"
-  #   url = "/blog"
-  #   weight = 3
-  # [[menu.main]]
-  #   name = "Pricing"
-  #   url = "/pricing"
-  #   weight = 4
-  # [[menu.main]]
-  #   name = "About Us"
-  #   url = "/company"
-  #   weight = 5
-    # [menu.main.params]  
-      # has_submenu = true
-      # submenu = [
-        # { name = "About Us", url = "/company/" },
-        # { name = "Careers", url = "/careers/" }
-      # ]
+[sitemap]
+	changeFreq = 'weekly'
+	priority = 0.5
 
-  # Footer Column 1 Menu
-  [[menu.footer_column_1]]
-    name = "Performance"
-    url = "/features/performance/"
-    weight = 1
-  [[menu.footer_column_1]]
-    name = "Design System"
-    url = "/features/design-system/"
-    weight = 2
-  [[menu.footer_column_1]]
-    name = "Developer Experience"
-    url = "/features/developer-experience/"
-    weight = 3
+[taxonomies]
+	category = 'categories'
+	tag = 'tags'
+	# maturity of a post's tool/guide: prototype, in-progress, stable (content/stage/). Shown as an animated
+	# icon before the read time on cards (brewm) and in the byline; icons in custom.css
+	stage = 'stage'
+	# post authors: `author: [koustav]` in a post; each author's profile / résumé is content/author/<id>/_index.md
+	# (`layout: resume`, `url: /<id>/`). Posts without one can still use `byline: {name, avatar}`
+	author = 'author'
 
-  # Footer Column 2 Menu
-  [[menu.footer_column_2]]
-    name = "Articles"
-    url = "/articles"
-    weight = 1
-  [[menu.footer_column_2]]
-    name = "About Us"
-    url = "/company"
-    weight = 2
-  [[menu.footer_column_2]]
-    name = "Careers"
-    url = "/careers"
-    weight = 3
+[params]
+	description = 'Robots, open-source tools and experiments from a one-person robotics workshop.'
+	copyright = '© 2025–2026 Links & Joints Studios · Koustav Betal'
+	HideHugoCredit = false
+	extMeta = true
+	AllowAIRobots = false
+	ZenMode = false
+	DisableFootBar = false
+	unifiedFooter = true
+	coffeeStat = false
 
-  # Footer Column 3 Menu
-  [[menu.footer_column_3]]
-    name = "License"
-    url = "/license"
-    weight = 1
-  [[menu.footer_column_3]]
-    name = "Privacy Policy"
-    url = "/privacy"
-    weight = 2
+	[params.author]
+		name = 'Koustav Betal'
+		# default byline for posts without `byline: {name, avatar}` front matter (layouts/partials/page/timestamp.html)
+		avatar = 'https://github.com/koustavbetal.png'
+
+	[params.comments]
+		disabled = true
+
+	# brewm's only end-of-body hook; we use it for the Settings panel script, not for analytics
+	[params.analytics]
+		append = 'body'
+
+	[params.favicon]
+		ico = '/images/favicon.ico'
+		png = '/images/favicon-32x32.png'
+		apple = '/images/apple-touch-icon.png'
+		webmanifest = '/images/site.webmanifest'
+		appTitle = 'LnJ Studios'
+
+	[params.logo]
+		logoMark = '/images/brand/lnj-studios-ink.svg'
+		logoMarkDark = '/images/brand/lnj-studios-paper.svg'
+		logoType = false
+
+	[params.feed]
+		flowlines = false
+
+	[params.home]
+		disableSlide = false
+		disableListing = false
+		featuredListing = ['categories']
+
+	[params.posts]
+		justifying = false
+		noIndent = true
+		sfdefault = true
+		# no colophon (URL + QR + build info) and no brewm share block: sharing is the Share button on the
+		# right-hand rail (layouts/partials/rail.html)
+		colophon = false
+		disableHistory = false
+		related = true
+		share = false
+
+	# brewm's own header search is off (it hands off to DuckDuckGo or Pagefind); the site search is our
+	# pill at the bottom left (assets/js/lnj-search.js), reading the index Hugo itself renders from
+	# assets/json/search-index.json
+	[params.search]
+		enable = false
+		pagefind = false
+
+	[params.typeface]
+		webSafe = false
+		roman = 'crimson'
+		sans = 'inter'
+		localHost = true
+		minimalUI = false
+
+	[params.socialCard]
+		enable = true
+		# absolute: LinkedIn / X / WhatsApp can't fetch a relative og:image (brewm prints this as is)
+		images = 'https://lnjstudios.com/images/brand/social-card.png'
+		imagesAlt = 'Links & Joints Studios: robots, open-source tools and experiments from a one-person robotics workshop'
+		twitter = true
+		twitterCreator = 'koustavbetal' # brewm adds the @
+		opengraph = true
+
+	# Workshop orange (same family as ROS-Manager's palette)
+	[params.style]
+		[params.style.light]
+			ac = '#b34700'
+			bg = '#f4f1ec'
+			fg = '#1b1b1b'
+			mid = '#6b6560'
+		[params.style.dark]
+			ac = '#ff8a1f'
+			bg = '#111111'
+			fg = '#f0f0f0'
+			mid = '#9a948e'
+
+[languages]
+	[languages.en]
+		label = 'English'
+		locale = 'en-IN'
+		direction = 'ltr'
+		weight = 1
+		[languages.en.pagination]
+			pagerSize = 8
+			path = 'page'
+
+[menus]
+	# No header (Tools/Notes live in the home categories; About and RSS are in the Settings panel)
+
+	[[menus.footer]]
+		identifier = 'youtube'
+		name = 'YouTube'
+		url = 'https://youtube.com/@linksnjoints'
+		pre = 'youtube'
+		weight = 1
+	[[menus.footer]]
+		identifier = 'github'
+		name = 'GitHub'
+		url = 'https://github.com/koustavbetal'
+		pre = 'github'
+		weight = 2
+	[[menus.footer]]
+		identifier = 'linkedin'
+		name = 'LinkedIn'
+		url = 'https://linkedin.com/in/koustavbetal'
+		pre = 'linkedin'
+		weight = 3
+	[[menus.footer]]
+		identifier = 'x'
+		name = 'X'
+		url = 'https://x.com/koustavbetal'
+		pre = 'x'
+		weight = 4
+	[[menus.footer]]
+		identifier = 'instagram'
+		name = 'Instagram'
+		url = 'https://instagram.com/koustavbetal'
+		pre = 'instagram'
+		weight = 5

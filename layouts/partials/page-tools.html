@@ -1,0 +1,45 @@
+{{- /*
+    Page tools (posts only, see rail.html), fixed just right of the article column, top: a vertical stack of accent pills
+    that stays put while scrolling (it replaces brewm's Print menu, hidden in custom.css):
+      Contents      (only when the page has h2/h3 headings) a drawer like the rail's: the table of contents
+                    (one pill per heading) slides open under it, pushing the buttons below down. It stays open,
+                    through scrolling, until the button is clicked again. Closed on page load.
+      Reading mode  brewm's "screen reader optimisation" (simpler, plainer page; no audio). It drives brewm's own
+                    #useSR switch, which is hidden in Settings
+      Print
+    Called from rail.html; behaviour in assets/js/lnj-tools.js, styles in custom.css.
+*/ -}}
+{{- $svg := `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"` | safeHTMLAttr }}
+<div class="lnj-tools">
+    {{- with .TableOfContents }}
+        {{- if strings.Contains . "<li>" }}
+            <div class="lnj-pop lnj-toc">
+                <button class="lnj-btn lnj-pill lnj-pop__toggle" type="button" aria-expanded="false" aria-controls="lnj-toc">
+                    <span class="lnj-pop__icon">
+                        <svg class="lnj-pop__glyph" {{ $svg }}><path d="M3 6h.01M3 12h.01M3 18h.01M8 6h13M8 12h13M8 18h13"/></svg>
+                        <svg class="lnj-pop__close" {{ $svg }}><path d="M6 6l12 12M18 6 6 18"/></svg>
+                    </span>
+                    <span class="lnj-pill__label">Contents</span>
+                </button>
+                <div class="lnj-drawer" id="lnj-toc" inert>
+                    <div class="lnj-drawer__inner">
+                        {{ . }}
+                    </div>
+                </div>
+            </div>
+        {{- end }}
+    {{- end }}
+    <button class="lnj-btn lnj-pill lnj-reading" type="button" aria-pressed="false" hidden>
+        <svg {{ $svg }}>
+            <path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        <span class="lnj-pill__label">Reading mode</span>
+    </button>
+    <button class="lnj-btn lnj-pill lnj-print" type="button">
+        <svg {{ $svg }}>
+            <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8" rx="1"/>
+        </svg>
+        <span class="lnj-pill__label">Print</span>
+    </button>
+</div>

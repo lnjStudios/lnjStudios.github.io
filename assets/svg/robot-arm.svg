@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" aria-hidden="true">
+    <!--
+        The two-link arm (the "links and joints" of the name) that used to be the About page's hero; kept here
+        for later. Self-contained: works as an <img> or inlined with
+        {{ (resources.Get "svg/robot-arm.svg").Content | safeHTML }}, where it picks up the site's --fg/--ac/--bg/--mid.
+    -->
+    <style>
+        .lnj-arm__link, .lnj-arm__base, .lnj-arm__grip { fill: none; stroke: var(--fg, #1b1b1b); stroke-linecap: round; stroke-linejoin: round; }
+        .lnj-arm__link { stroke-width: 12; }
+        .lnj-arm__base, .lnj-arm__grip { stroke-width: 8; }
+        .lnj-arm__joint { fill: var(--ac, #b34700); }
+        .lnj-arm__pin { fill: var(--bg, #ffffff); }
+        .lnj-arm__reach { fill: none; stroke: var(--mid, #777777); stroke-width: 1.5; stroke-dasharray: 3 8; opacity: 0.55; }
+        .lnj-arm__shoulder, .lnj-arm__elbow { transform-box: view-box; animation: lnj-shoulder 7s ease-in-out infinite; transform-origin: 70px 160px; }
+        .lnj-arm__elbow { animation-name: lnj-elbow; transform-origin: 70px 82px; }
+        @keyframes lnj-shoulder { 0%, 100% { transform: rotate(-8deg); } 35% { transform: rotate(22deg); } 65% { transform: rotate(6deg); } }
+        @keyframes lnj-elbow { 0%, 100% { transform: rotate(18deg); } 35% { transform: rotate(-30deg); } 65% { transform: rotate(8deg); } }
+        @media (prefers-reduced-motion: reduce) { .lnj-arm__shoulder, .lnj-arm__elbow { animation: none; } }
+    </style>
+    <circle class="lnj-arm__reach" cx="70" cy="160" r="120"/>
+    <path class="lnj-arm__base" d="M28 186h84M44 186a26 26 0 0 1 52 0"/>
+    <g class="lnj-arm__shoulder">
+        <path class="lnj-arm__link" d="M70 160V82"/>
+        <g class="lnj-arm__elbow">
+            <path class="lnj-arm__link" d="M70 82h78"/>
+            <path class="lnj-arm__grip" d="M166 64h-18v36h18"/>
+            <circle class="lnj-arm__joint" cx="70" cy="82" r="11"/>
+            <circle class="lnj-arm__pin" cx="70" cy="82" r="3.5"/>
+        </g>
+    </g>
+    <circle class="lnj-arm__joint" cx="70" cy="160" r="13"/>
+    <circle class="lnj-arm__pin" cx="70" cy="160" r="4"/>
+</svg>

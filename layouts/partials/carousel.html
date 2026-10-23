@@ -1,0 +1,53 @@
+{{- /*
+    LnJ home carousel (replaces hugo-brewm's).
+    Slides are content files with `type: slide`, ordered by weight. Front matter:
+      cover: image path      alt: image description
+      buttons: [{label: "...", url: "..."}, ...]   (any number, 0..n)
+    Autoplays when the pointer isn't over it; hover pauses; wheel (vertical or horizontal), drag and
+    arrow keys change slides.
+*/ -}}
+{{ "<!-- carousel.html (lnj) -->" | safeHTML }}
+{{- $slides := where .Site.RegularPages "Type" "slide" }}
+{{- with $slides }}
+    {{- $count := len . }}
+    <aside class="has-crsl lnj-slides" aria-roledescription="carousel" aria-label="Highlights" tabindex="0" data-interval="6000">
+        <div class="lnj-slides__track" aria-live="off">
+            {{- range $index, $slide := . }}
+                {{- $n := add $index 1 }}
+                {{- $cover := partial "page/cover.html" (dict "page" .Page) }}
+                {{- $alt := or .Params.alt .Params.coverAlt "" }}
+                <section id="slide-{{ $n }}" class="lnj-slide{{ if eq $n 1 }} is-active{{ end }}"
+                    aria-roledescription="slide" aria-label="{{ $n }} of {{ $count }}: {{ .Title }}"
+                    {{- if ne $n 1 }} aria-hidden="true"{{ end }}>
+                    {{- with $cover }}
+                        <div class="lnj-slide__media">
+                            <img src="{{ . }}" alt="{{ $alt }}" {{ if ne $n 1 }}loading="lazy"{{ end }}>
+                        </div>
+                    {{- end }}
+                    <div class="lnj-slide__text">
+                        <h2 class="section-title">{{ .Title }}</h2>
+                        {{ .Content }}
+                    </div>
+                    {{- with .Params.buttons }}
+                        <nav class="lnj-slide__actions" aria-label="{{ $slide.Title }}">
+                            {{- range . }}
+                                {{- $url := .url }}
+                                {{- $external := strings.HasPrefix $url "http" }}
+                                <a class="lnj-btn" href="{{ if $external }}{{ $url }}{{ else }}{{ $url | relLangURL }}{{ end }}"
+                                    {{- if $external }} target="_blank" rel="noopener"{{ end }}>{{ .label }}</a>
+                            {{- end }}
+                        </nav>
+                    {{- end }}
+                </section>
+            {{- end }}
+        </div>
+        {{- if gt $count 1 }}
+            <div class="lnj-slides__dots" aria-hidden="true">
+                {{- range $index, $_ := . }}<span{{ if eq $index 0 }} class="is-active"{{ end }}></span>{{ end }}
+            </div>
+        {{- end }}
+    </aside>
+    {{- with resources.Get "js/lnj-slides.js" | minify | fingerprint }}
+        <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" defer></script>
+    {{- end }}
+{{- end }}

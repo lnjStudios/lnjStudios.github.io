@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 200" aria-hidden="true">
+    <!--
+        Snapshot (2026-10-23) of the About page's first AMR hero: side view, cruising in place while the road and
+        speed lines stream past, wheels spin, the lidar pings ahead, and the body surges, pitches back on the
+        throttle and dips on the brakes (2.8s loop). Self-contained: works as an <img> or inlined with
+        {{ (resources.Get "svg/amr-cruise.svg").Content | safeHTML }}, where it picks up the site's --fg/--ac/--bg/--mid.
+    -->
+    <style>
+        .lnj-amr * { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .lnj-amr__road { stroke: var(--mid, #777777); stroke-width: 3; stroke-dasharray: 16 12; animation: lnj-amr-road 0.32s linear infinite; }
+        .lnj-amr__trail path { stroke: var(--mid, #777777); stroke-width: 4; animation: lnj-amr-trail 0.7s linear infinite; }
+        .lnj-amr__trail path:nth-child(2) { animation-delay: -0.25s; }
+        .lnj-amr__trail path:nth-child(3) { animation-delay: -0.5s; }
+        .lnj-amr__body, .lnj-amr__deck, .lnj-amr__lidar, .lnj-amr__tyre { stroke: var(--fg, #1b1b1b); stroke-width: 7; }
+        .lnj-amr__body, .lnj-amr__lidar, .lnj-amr__tyre { fill: var(--bg, #ffffff); }
+        .lnj-amr__deck, .lnj-amr__lidar { stroke-width: 5; }
+        .lnj-amr__led { stroke: var(--ac, #b34700); stroke-width: 6; animation: lnj-amr-blink 0.9s steps(2, jump-none) infinite; }
+        .lnj-amr__eye { stroke: var(--ac, #b34700); stroke-width: 5; }
+        .lnj-amr__spokes { stroke: var(--fg, #1b1b1b); stroke-width: 3; }
+        .lnj-amr__hub { fill: var(--ac, #b34700); stroke: none; }
+        .lnj-amr__scan path { stroke: var(--ac, #b34700); stroke-width: 2.5; stroke-dasharray: 4 9; opacity: 0.8; animation: lnj-amr-scan 0.5s linear infinite; }
+        .lnj-amr__dust circle { stroke: var(--mid, #777777); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: lnj-amr-dust 0.7s ease-out infinite; }
+        .lnj-amr__dust circle:nth-child(2) { animation-delay: -0.35s; }
+        .lnj-amr__wheel { transform-box: view-box; animation: lnj-amr-spin 0.36s linear infinite; }
+        .lnj-amr__bot { animation: lnj-amr-surge 2.8s ease-in-out infinite; }
+        .lnj-amr__pitch { transform-box: view-box; transform-origin: 132px 171px; animation: lnj-amr-pitch 2.8s ease-in-out infinite; }
+        @keyframes lnj-amr-road { to { stroke-dashoffset: 28; } }
+        @keyframes lnj-amr-scan { to { stroke-dashoffset: -13; } }
+        @keyframes lnj-amr-spin { to { transform: rotate(360deg); } }
+        @keyframes lnj-amr-blink { 50% { opacity: 0.35; } }
+        @keyframes lnj-amr-trail { 0% { transform: translateX(24px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateX(-36px); opacity: 0; } }
+        @keyframes lnj-amr-dust { 0% { transform: translate(0, 0) scale(0.6); opacity: 0.9; } 100% { transform: translate(-26px, -8px) scale(1.6); opacity: 0; } }
+        @keyframes lnj-amr-surge { 0%, 100% { transform: translateX(-8px); } 45% { transform: translateX(12px); } 60% { transform: translateX(10px); } }
+        @keyframes lnj-amr-pitch { 0%, 100% { transform: rotate(0deg); } 20% { transform: rotate(-3deg); } 45% { transform: rotate(0deg); } 55% { transform: rotate(2deg); } 70% { transform: rotate(0deg); } }
+        @media (prefers-reduced-motion: reduce) { .lnj-amr * { animation: none !important; } }
+    </style>
+    <g class="lnj-amr">
+        <path class="lnj-amr__road" d="M0 171h240"/>
+        <g class="lnj-amr__trail">
+            <path d="M14 114h40"/>
+            <path d="M2 130h46"/>
+            <path d="M22 146h30"/>
+        </g>
+        <g class="lnj-amr__bot">
+            <g class="lnj-amr__dust">
+                <circle cx="70" cy="164" r="4"/>
+                <circle cx="62" cy="160" r="3"/>
+            </g>
+            <g class="lnj-amr__pitch">
+                <g class="lnj-amr__scan">
+                    <path d="M190 98 226 83M190 98h36M190 98l36 15"/>
+                </g>
+                <path class="lnj-amr__deck" d="M90 106V93h58v13"/>
+                <rect class="lnj-amr__body" x="66" y="106" width="134" height="42" rx="13"/>
+                <rect class="lnj-amr__lidar" x="180" y="90" width="20" height="16" rx="4"/>
+                <path class="lnj-amr__led" d="M84 127h34"/>
+                <path class="lnj-amr__eye" d="M188 120v14"/>
+            </g>
+            <g class="lnj-amr__wheel" style="transform-origin: 98px 154px">
+                <circle class="lnj-amr__tyre" cx="98" cy="154" r="15"/>
+                <path class="lnj-amr__spokes" d="M98 143v22M87 154h22"/>
+                <circle class="lnj-amr__hub" cx="98" cy="154" r="5"/>
+            </g>
+            <g class="lnj-amr__wheel" style="transform-origin: 166px 154px">
+                <circle class="lnj-amr__tyre" cx="166" cy="154" r="15"/>
+                <path class="lnj-amr__spokes" d="M166 143v22M155 154h22"/>
+                <circle class="lnj-amr__hub" cx="166" cy="154" r="5"/>
+            </g>
+        </g>
+    </g>
+</svg>

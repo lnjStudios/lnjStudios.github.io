@@ -1,0 +1,3744 @@
+/* LnJ Studios overrides for hugo-brewm */
+
+/* The logo is a wide lockup (mark + "lnj studios"), not a square mark.
+   --lnj-logo-h sets its size: big on the home page's title card, smaller elsewhere. */
+:root {
+    --lnj-logo-h: 3.5rem;
+}
+
+/* Desktop home: the logo shares the category cards' row (brewm cards: 12.8rem tall, top edge 2rem + 1ex
+   down). It's as tall as the cards when it fits, otherwise as wide as the slides pane allows
+   (38vw minus the header's gutters, lockup aspect 4.2157:1), and centred on the cards' row. */
+@media (min-width: 1153px) {
+    body:has(> aside.lnj-slides) {
+        --lnj-logo-h: min(12.8rem, calc((38vw - 3rem - 2ex) / 4.2157));
+    }
+
+    /* the title card stays put with the slides pane; only the right side scrolls */
+    body:has(> aside.lnj-slides) > header {
+        position: fixed;
+        right: auto;
+        width: 38vw;
+        padding-top: calc(2rem + 1ex + (12.8rem - var(--lnj-logo-h)) / 2);
+    }
+
+    body:has(> aside.lnj-slides) #logo #logomark,
+    body:has(> aside.lnj-slides) #logo #logomark--dark {
+        max-width: none;
+    }
+}
+
+html body > header #logo,
+html body > header #logo * {
+    --h: var(--lnj-logo-h);
+}
+
+#logo #logomark,
+#logo #logomark--dark {
+    height: var(--lnj-logo-h);
+    width: auto;
+    max-width: min(34vw, 90vw);
+}
+
+@media (max-width: 1152px) {
+    #logo #logomark,
+    #logo #logomark--dark {
+        max-width: calc(100vw - 2rem);
+    }
+
+    /* phones / tablets: room above the logo so it doesn't touch the browser bar (brewm's
+       `body > header.pagewidth { padding: 0 … }` would otherwise win over our padding-top) */
+    html body > header.pagewidth {
+        padding-top: calc(1.5rem + env(safe-area-inset-top));
+    }
+}
+
+/* Theme only ships the light/dark logo swap with logoType; mirror it for no-JS visitors */
+#logomark--dark + #logomark {
+    display: inline-block;
+}
+
+@media (prefers-color-scheme: dark) {
+    #logomark--dark {
+        display: inline-block;
+    }
+
+    #logomark--dark + #logomark {
+        display: none;
+    }
+}
+
+/* ------------------------------------------------------------------
+   Home: two columns. Main (64%): workbench photo, then the posts.
+   Side (33%): greeter text, then "Discover topics". Edges line up.
+   ------------------------------------------------------------------ */
+@media (min-width: 1153px) {
+    html #home .hero {
+        display: grid;
+        grid-template-columns: 64% 1fr;
+        column-gap: 3%;
+        align-items: center;
+        padding: 2rem 0 1rem;
+    }
+
+    html #home .hero__image,
+    html #home .hero__image + .hero__content {
+        position: static;
+        width: auto;
+        max-width: none;
+    }
+
+    html #home .hero__image img {
+        padding: 0;
+        border-radius: 1ex;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+    }
+
+    /* greeter text spans the photo's height: heading at its top edge, last line at its bottom edge */
+    html #home .hero__image + .hero__content {
+        display: flex;
+        flex-direction: column;
+        align-self: stretch;
+        padding: 0;
+        font-size: var(--normalsize);
+    }
+
+    html #home .hero__content h1 {
+        margin-top: -0.2em;
+        margin-bottom: auto;
+        font-size: var(--Large);
+    }
+
+    html #home .hero__content p:last-child {
+        margin-bottom: 0;
+    }
+
+    html body > main#home > aside#list-tags {
+        width: calc(33% - 0.66rem);
+        margin-right: 1rem;
+        padding: 0;
+    }
+
+    html #home #list-tags .section-title {
+        font-size: var(--small);
+    }
+
+    html #home #list-tags nav {
+        font-size: 0.8em;
+        padding: 0;
+    }
+
+    html #home #list-posts {
+        max-width: none;
+    }
+
+    /* theme fixes the feed at the golden ratio; match the photo column */
+    html #home #list-posts > div {
+        width: 64%;
+    }
+}
+
+/* Mobile / tablet home (one column): logo, slider, then the photo + greeter text, categories, recent posts,
+   Discover topics. brewm's order is categories, photo, Discover topics, posts. */
+@media (max-width: 1152px) {
+    html body > main#home {
+        display: flex;
+        flex-direction: column;
+    }
+
+    html body > main#home > #top {
+        display: flex;
+        flex-direction: column;
+    }
+
+    html body > main#home > #top > .hero {
+        order: -1;
+        margin-bottom: 1.5rem;
+    }
+
+    html body > main#home > #list-posts {
+        order: 1;
+    }
+
+    html body > main#home > aside#list-tags {
+        order: 2;
+    }
+
+    html body > main#home > #exclude {
+        order: 3;
+    }
+
+    /* one column: brewm centres the greeter text at 86% width, inside the photo above it; match the photo */
+    html #home .hero__image + .hero__content {
+        align-self: stretch;
+        width: auto;
+    }
+}
+
+/* brewm's inline "graceful degradation fallback" (meant for when its stylesheet fails) caps every image at 86vw,
+   and it stays active: on a phone images stopped short of the text's right edge (post banner, feed cards,
+   home photo). Images fit their column instead. */
+html body img {
+    max-width: 100%;
+}
+
+/* Phones, every page but home: a text gutter. brewm makes the gutter (--void) the bottom bar's height here,
+   and we removed the bar (--vfoot: 0), so text ran to the screen edges. Images fill the content width, so
+   they line up with the text within the gutter. */
+@media (max-width: 640px) {
+    html body:not(:has(> main#home)) {
+        --void: 1.25rem;
+    }
+
+    /* list pages (categories, tags): brewm's card padding came on top of the gutter, so card text and images
+       sat a step inside the page heading and logo; on phones the cards use the gutter alone */
+    html body:not(:has(> main#home)) #list-posts .feed-item {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    /* the logo row too: brewm (≤480px) zeroes the gutter on the header itself */
+    html body:not(:has(> main#home)) > header.pagewidth {
+        padding-right: 1.25rem;
+        padding-left: 1.25rem;
+    }
+
+    /* no breadcrumbs on phones: little room, and Home / Categories are on the rail. On articles that empties
+       brewm's page header (its Print menu is hidden too), so drop the whole row and its spacing, leaving one
+       gap between the logo and the byline */
+    html body > main > header.pagewidth #has-breadcrumb,
+    html body > main#page > header.pagewidth {
+        display: none;
+    }
+
+    html body > main#page #main-article {
+        margin-top: 0.5rem;
+    }
+}
+
+/* ------------------------------------------------------------------
+   Home carousel (layouts/partials/carousel.html + assets/js/lnj-slides.js)
+   ------------------------------------------------------------------ */
+.lnj-slides {
+    --lnj-px: 0px;
+    --lnj-py: 0px;
+    overflow: hidden;
+    outline: none;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+.lnj-slides:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--ac);
+}
+
+.lnj-slides__track {
+    position: relative;
+    height: 100%;
+}
+
+/* slides wait off to the right, the active one is centred, the one leaving goes left (.is-left) */
+.lnj-slide {
+    --lnj-ease: cubic-bezier(0.65, 0, 0.35, 1);
+    position: absolute;
+    inset: 0;
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 900ms var(--lnj-ease), opacity 900ms ease, visibility 0s 900ms;
+}
+
+.lnj-slide.is-left {
+    transform: translateX(-100%);
+}
+
+.lnj-slide.is-active {
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    transition: transform 900ms var(--lnj-ease), opacity 900ms ease;
+}
+
+.lnj-slide.no-anim {
+    transition: none;
+}
+
+/* big image, fading out to the right */
+.lnj-slide__media {
+    position: absolute;
+    top: 1.5rem;
+    bottom: 1.5rem;
+    left: 0;
+    width: 78%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, #000 35%, transparent 88%);
+            mask-image: linear-gradient(to right, #000 35%, transparent 88%);
+}
+
+/* slide art is transparent PNG cropped tight to the shape: show all of it, as large as the pane allows */
+.lnj-slide__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: translate(var(--lnj-px), var(--lnj-py)) scale(1.05);
+    transition: transform 400ms ease-out;
+    -webkit-user-drag: none;
+}
+
+/* plain text over the faded part of the image; a soft glow in the page colour keeps it readable */
+.lnj-slide__text {
+    position: absolute;
+    top: 50%;
+    left: 56%;
+    right: 1.25rem;
+    transform: translateY(-55%);
+    font-size: var(--small);
+    line-height: 1.6;
+    text-shadow: 0 0 6px var(--bg), 0 0 14px var(--bg), 0 0 24px var(--bg);
+    user-select: text;
+}
+
+.lnj-slide__text .section-title {
+    margin: 0 0 1ex;
+    font-size: var(--large);
+}
+
+.lnj-slide__text p,
+.lnj-slide__text ul {
+    margin: 0 0 1ex;
+}
+
+.lnj-slide__text ul {
+    padding-left: 1.1em;
+}
+
+/* per-slide buttons: same row as the gear and the rail's bottom button (the "dock") */
+:root {
+    --lnj-dock-bottom: 0.75rem;
+    --lnj-dock-h: 2.5rem;
+}
+
+.lnj-slide__actions {
+    display: flex;
+    position: absolute;
+    right: 1rem;
+    bottom: var(--lnj-dock-bottom);
+    left: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: var(--lnj-dock-h);
+}
+
+/* Pill buttons. The accent is the only colour: an underline at rest, a full ring and a soft glow on hover.
+   Both are one inset box-shadow, so they follow the pill's curve and animate smoothly between each other. */
+.lnj-btn,
+html body > footer #has-a11y-summary {
+    --lnj-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 2rem;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+    height: var(--lnj-dock-h);
+    color: var(--fg);
+    box-shadow: inset 0 -2px 0 0 var(--ac), 0 0 0 0 transparent;
+    transition: transform 280ms var(--lnj-spring), box-shadow 280ms ease;
+    will-change: transform;
+}
+
+.lnj-btn {
+    padding: 0 1.15em;
+    font-size: var(--small);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.lnj-btn:hover,
+.lnj-btn:focus-visible,
+html body > footer #has-a11y-summary:hover,
+html body > footer #has-a11y-summary:focus-visible {
+    outline: none;
+    transform: translateY(-3px);
+    box-shadow: inset 0 0 0 2px var(--ac), 0 10px 22px -10px var(--ac);
+}
+
+.lnj-btn:active,
+html body > footer #has-a11y-summary:active {
+    transform: translateY(0) scale(0.96);
+    transition-duration: 90ms;
+}
+
+/* progress dots (top right): small dots; the active one stretches into a pill that fills over the
+   autoplay interval. The fill is a GPU-composited transform so it moves smoothly, not pixel by pixel. */
+.lnj-slides__dots {
+    display: flex;
+    position: absolute;
+    top: 1.5rem;
+    right: 1rem;
+    align-items: center;
+    gap: 6px;
+}
+
+.lnj-slides__dots > span {
+    position: relative;
+    border-radius: 99px;
+    background: color-mix(in srgb, var(--fg) 25%, transparent);
+    width: 8px;
+    height: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: width 500ms cubic-bezier(0.65, 0, 0.35, 1), background-color 200ms ease;
+}
+
+.lnj-slides__dots > span:hover {
+    background: color-mix(in srgb, var(--fg) 45%, transparent);
+}
+
+.lnj-slides__dots > span.is-active {
+    width: 3rem;
+}
+
+.lnj-slides__dots > span.is-active::after {
+    position: absolute;
+    inset: 0;
+    transform: translateZ(0) scaleX(0);
+    transform-origin: left;
+    animation: lnj-progress var(--lnj-interval, 6s) linear forwards;
+    border-radius: inherit;
+    background: var(--ac);
+    content: '';
+    will-change: transform;
+}
+
+.lnj-slides.is-paused .lnj-slides__dots > span.is-active::after {
+    animation-play-state: paused;
+}
+
+@keyframes lnj-progress {
+    from { transform: translateZ(0) scaleX(0); }
+    to { transform: translateZ(0) scaleX(1); }
+}
+
+/* desktop: fixed panel on the left, below the title card (logo), so it starts level with the photo
+   on the right: under the category cards' row (top 2rem + 1ex, 12.8rem tall) plus 1rem */
+@media (min-width: 1153px) {
+    html body > aside.lnj-slides {
+        --lnj-pane-top: calc(3rem + 1ex + 12.8rem);
+        display: block;
+        position: fixed;
+        top: var(--lnj-pane-top);
+        left: 0;
+        z-index: 1;
+        padding: 0;
+        width: 38vw;
+        height: calc(100vh - var(--lnj-pane-top));
+    }
+
+    .lnj-slide__media {
+        top: 0;
+        bottom: 0;
+        left: 1.5rem;
+    }
+
+    /* dots stand vertically on the pane's right edge, just above the buttons;
+       the active one stretches and fills bottom to top */
+    .lnj-slides__dots {
+        top: auto;
+        right: 1.25rem;
+        bottom: calc(var(--lnj-dock-bottom) + var(--lnj-dock-h) + 1.25rem);
+        flex-direction: column;
+    }
+
+    .lnj-slides__dots > span {
+        transition: height 500ms cubic-bezier(0.65, 0, 0.35, 1), background-color 200ms ease;
+    }
+
+    .lnj-slides__dots > span.is-active {
+        width: 8px;
+        height: 3rem;
+    }
+
+    .lnj-slides__dots > span.is-active::after {
+        transform: translateZ(0) scaleY(0);
+        transform-origin: bottom;
+        animation-name: lnj-progress-y;
+    }
+}
+
+@keyframes lnj-progress-y {
+    from { transform: translateZ(0) scaleY(0); }
+    to { transform: translateZ(0) scaleY(1); }
+}
+
+/* tablet / phone: full-width block above the feed, image fades to the bottom */
+@media (max-width: 1152px) {
+    html body > aside.lnj-slides {
+        display: block;
+        position: relative;
+        margin: 0 1rem;
+        width: auto;
+        height: min(80svh, 44rem);
+    }
+
+    .lnj-slide__media {
+        inset: 0;
+        width: 100%;
+        -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+                mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+    }
+
+    .lnj-slide__text {
+        top: auto;
+        right: 0;
+        bottom: 4.5rem;
+        left: 0;
+        transform: none;
+    }
+
+    .lnj-slide__actions {
+        right: 0;
+        bottom: 1rem;
+        left: 0;
+        justify-content: flex-start;
+    }
+
+    .lnj-slides__dots {
+        top: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lnj-slide,
+    .lnj-slide.is-active,
+    .lnj-slide__media img {
+        transition: none;
+    }
+}
+
+/* No top bar and no bottom bar, not even the space they reserved: brewm offsets everything by
+   --vhead / --vfoot, so both go to zero. Only the logo stays; Tools/Notes are the home categories,
+   About and RSS are in Settings, search is bottom left. */
+:root {
+    --vhead: 0px !important;
+    --vfoot: 0px !important;
+}
+
+html body > header #top-nav,
+#background-header {
+    display: none !important;
+}
+
+/* z-index 2: above the slides pane (1), and level with the bottom dock, which comes later in the page,
+   so brewm's blur screen (inside the dock) covers the logo too when Settings is open */
+html body > header {
+    position: relative;
+    z-index: 2;
+    justify-content: flex-start;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    height: auto;
+    pointer-events: none;
+}
+
+/* desktop: the logo floats over the page (top left, the "title card" above the slides pane) instead of taking a row */
+@media (min-width: 1153px) {
+    html body > header {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+    }
+
+    html body > main#home {
+        padding-top: 1rem;
+    }
+
+    /* other pages have no slides pane under the logo, so leave it a row of space */
+    html body > main:not(#home) {
+        padding-top: calc(var(--lnj-logo-h) + 2rem);
+    }
+
+    html body > main#home > aside#list-tags {
+        top: 1rem;
+    }
+}
+
+html body > header #logo {
+    pointer-events: auto;
+}
+
+/* No bottom bar: brewm's footer row floats over the page, holding only the Settings gear and the search
+   pill (bottom left). Bottom right is our own vertical rail (.lnj-rail, below) */
+#background-footer {
+    display: none !important;
+}
+
+html body > footer.pagewidth {
+    position: fixed;
+    right: 0;
+    bottom: var(--lnj-dock-bottom);
+    left: 0;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    background: none;
+    padding: 0 1rem;
+    height: var(--lnj-dock-h);
+    pointer-events: none;
+}
+
+html body > footer.pagewidth > * {
+    pointer-events: auto;
+}
+
+/* brewm's back-to-top: the rail has its own */
+html body > footer > nav {
+    display: none;
+}
+
+/* the gear goes first, then the search pill (moved here by analytics.html) */
+html body > footer #has-a11y {
+    order: -1;
+    margin: 0;
+}
+
+html body > footer > :not(#has-a11y, .lnj-search) {
+    flex-shrink: 0;
+}
+
+/* Icon-only pills (.lnj-pill, and the gear) whose label slides out on hover / keyboard focus.
+   Collapsed, the side padding centres the 1.2rem icon in a dock-h circle; the label grows from zero width. */
+.lnj-pill__label {
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition: max-width 380ms cubic-bezier(0.65, 0, 0.35, 1), margin 380ms cubic-bezier(0.65, 0, 0.35, 1),
+        opacity 200ms ease;
+}
+
+.lnj-pill {
+    padding: 0 calc((var(--lnj-dock-h) - 1.2rem) / 2);
+}
+
+.lnj-pill > svg {
+    flex: none;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.lnj-pill,
+html body > footer #has-a11y-summary {
+    transition: transform 280ms var(--lnj-spring), box-shadow 280ms ease,
+        padding 380ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.lnj-pill:hover,
+.lnj-pill:focus-visible,
+html body > footer #has-a11y-summary:hover,
+html body > footer #has-a11y-summary:focus-visible {
+    padding-right: 1.15em;
+}
+
+.lnj-pill:hover .lnj-pill__label,
+.lnj-pill:focus-visible .lnj-pill__label,
+html body > footer #has-a11y-summary:hover .lnj-pill__label,
+html body > footer #has-a11y-summary:focus-visible .lnj-pill__label {
+    margin-left: 0.55em;
+    max-width: 10em;
+    opacity: 1;
+    transition-delay: 0s, 0s, 120ms;
+}
+
+/* the docs' LD mark, drawn as a mask so it takes the text colour */
+.lnj-docs__logo {
+    flex: none;
+    background: currentColor;
+    width: 1.2rem; /* same as the gear icon */
+    height: 1.2rem;
+    -webkit-mask: url("/images/brand/links-and-docs.png") center / contain no-repeat;
+            mask: url("/images/brand/links-and-docs.png") center / contain no-repeat;
+}
+
+/* ------------------------------------------------------------------
+   Right-hand rail, bottom right (layouts/partials/rail.html, assets/js/lnj-rail.js): a vertical stack of
+   icon pills, its bottom button level with the dock row. Labels slide out to the LEFT here.
+   z-index 1, under brewm's footer (2), so Settings' blur screen covers it. Drawers open in place.
+   ------------------------------------------------------------------ */
+.lnj-rail {
+    display: flex;
+    position: fixed;
+    right: 1rem;
+    bottom: var(--lnj-dock-bottom);
+    z-index: 1;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.lnj-rail > * {
+    pointer-events: auto;
+}
+
+.lnj-rail a::after {
+    content: none !important; /* brewm's external-link arrow */
+}
+
+.lnj-rail .lnj-pill {
+    flex-direction: row-reverse;
+    cursor: pointer;
+}
+
+.lnj-rail button.lnj-btn {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.lnj-rail .lnj-pill:hover,
+.lnj-rail .lnj-pill:focus-visible {
+    padding-right: calc((var(--lnj-dock-h) - 1.2rem) / 2);
+    padding-left: 1.15em;
+}
+
+.lnj-rail .lnj-pill:hover .lnj-pill__label,
+.lnj-rail .lnj-pill:focus-visible .lnj-pill__label {
+    margin-right: 0.55em;
+    margin-left: 0;
+}
+
+/* back to top: hidden until the page is scrolled (lnj-rail.js sets .is-shown), then pops in */
+.lnj-totop {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.8);
+    transition: transform 280ms var(--lnj-spring), box-shadow 280ms ease, opacity 200ms ease,
+        visibility 0s 280ms, padding 380ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.lnj-totop.is-shown {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-delay: 0s;
+}
+
+.lnj-totop.is-shown:hover,
+.lnj-totop.is-shown:focus-visible {
+    transform: translateY(-3px);
+}
+
+/* Drawers (Categories, Share): the contents open in the stack right ABOVE the toggle, which stays put
+   (column-reverse; the toggle comes first in the markup). Opening grows the drawer's single grid row
+   from 0fr to 1fr, so the buttons above slide up to make room; the contents rise in one after another,
+   nearest the toggle first. */
+.lnj-rail .lnj-pop {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+}
+
+.lnj-drawer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 420ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.lnj-pop.is-open > .lnj-drawer {
+    grid-template-rows: 1fr;
+}
+
+.lnj-drawer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    /* room either side for the pills' hover glow, taken back by the negative margin. No vertical padding:
+       a collapsed 0fr row would keep it, so the gap above the toggle is the last child's margin */
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+    min-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 220ms ease;
+}
+
+.lnj-pop.is-open .lnj-drawer__inner {
+    opacity: 1;
+    transition-duration: 300ms;
+}
+
+.lnj-rail .lnj-drawer__inner > :last-child {
+    margin-bottom: 0.5rem;
+}
+
+.lnj-pop.is-settled .lnj-drawer__inner {
+    overflow: visible;
+}
+
+.lnj-rail .lnj-pop.is-open .lnj-drawer__inner > * {
+    animation: lnj-rise 420ms var(--lnj-spring, ease) backwards;
+}
+
+.lnj-rail .lnj-pop.is-open .lnj-drawer__inner > :nth-last-child(2) { animation-delay: 60ms; }
+.lnj-rail .lnj-pop.is-open .lnj-drawer__inner > :nth-last-child(3) { animation-delay: 120ms; }
+.lnj-rail .lnj-pop.is-open .lnj-drawer__inner > :nth-last-child(4) { animation-delay: 180ms; }
+
+@keyframes lnj-rise {
+    from { transform: translateY(0.75rem) scale(0.9); opacity: 0; }
+    to { transform: none; opacity: 1; }
+}
+
+/* the open drawer's toggle: accent ring, no label, and its icon spins into an x */
+.lnj-rail .lnj-pop.is-open > .lnj-pill {
+    padding: 0 calc((var(--lnj-dock-h) - 1.2rem) / 2);
+    box-shadow: inset 0 0 0 2px var(--ac);
+}
+
+.lnj-rail .lnj-pop.is-open > .lnj-pill .lnj-pill__label {
+    margin: 0;
+    max-width: 0;
+    opacity: 0;
+}
+
+.lnj-pop__icon {
+    display: grid;
+    flex: none;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.lnj-pop__icon > svg {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    transition: transform 520ms var(--lnj-spring), opacity 220ms ease;
+}
+
+.lnj-pop__close {
+    transform: rotate(-180deg) scale(0.3);
+    opacity: 0;
+}
+
+.lnj-pop.is-open .lnj-pop__glyph {
+    transform: rotate(180deg) scale(0.3);
+    opacity: 0;
+}
+
+.lnj-pop.is-open .lnj-pop__close {
+    transform: none;
+    opacity: 1;
+}
+
+/* Categories: a floating pill per category, with its post count */
+.lnj-cats__count {
+    margin-left: 0.6em;
+    color: var(--mid);
+    font-weight: 400;
+}
+
+/* Share: QR, then a row of platform icons, then the copy buttons, all floating */
+.lnj-share__qr {
+    border-radius: 1ex;
+    width: 9rem;
+    height: auto;
+    image-rendering: pixelated;
+    box-shadow: 0 10px 22px -14px color-mix(in srgb, var(--fg) 60%, transparent);
+}
+
+.lnj-share__icons,
+.lnj-share__copy {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.lnj-share__icons .icon {
+    font-size: 1.1rem;
+}
+
+/* the Accessibility button becomes a gear (icon drawn as a mask, so it takes the text colour), with a
+   "Settings" label (lnj-settings.js) that slides out on hover like the Docs button */
+html body > footer #has-a11y-summary {
+    padding: 0 calc((var(--lnj-dock-h) - 1.2rem) / 2);
+    font-size: var(--small);
+    font-weight: 600;
+    list-style: none;
+}
+
+html body > footer #has-a11y-summary > kbd {
+    display: none;
+}
+
+html body > footer #has-a11y-summary::before {
+    flex: none;
+    transition: transform 400ms var(--lnj-spring);
+    background: currentColor;
+    width: 1.2rem;
+    height: 1.2rem;
+    content: '';
+    -webkit-mask: var(--lnj-gear) center / contain no-repeat;
+            mask: var(--lnj-gear) center / contain no-repeat;
+    --lnj-gear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E");
+}
+
+html body > footer #has-a11y-summary:hover::before,
+html body > footer #has-a11y[open] > #has-a11y-summary::before {
+    transform: rotate(60deg);
+}
+
+/* the Settings panel opens above the gear, left-aligned */
+html body #has-a11y #a11y {
+    right: auto;
+    bottom: calc(var(--lnj-dock-bottom) + var(--lnj-dock-h) + 0.75rem);
+    left: 1rem;
+    width: min(23rem, calc(100vw - 2rem));
+}
+
+/* article pages: BionRead, moved here from the bottom bar by lnj-settings.js, as a switch like
+   OpenDyslexic (undo brewm's bar-button looks: caps, letter-spacing) */
+html body #a11y .lnj-a11y-switch {
+    position: static !important;
+    letter-spacing: normal;
+    font-size: inherit;
+}
+
+/* Settings switches (Reading mode, OpenDyslexic, BionRead): one row, a column each (lnj-settings.js groups
+   them; short labels in i18n/en.toml). A label that doesn't fit wraps to two lines, and every pill in the row
+   stretches to the same height (grid stretch + height: 100%). On posts (main#page.post) Reading mode lives in
+   the page tools instead, so it's hidden here. BionRead only works on posts (brewm's single layout marks the
+   text `data-bionRead-safe`), so everywhere else (About, /write/, ...) it's hidden and Settings is like home's */
+html body:has(> main#page.post) #a11y #optimizeSR,
+html body:not(:has(> main#page.post)) #a11y #useBionRead {
+    display: none;
+}
+
+html body #a11y .lnj-a11y-switches {
+    display: grid;
+    order: 5;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    gap: 0.5rem;
+}
+
+html body #a11y .lnj-a11y-switches > * {
+    margin: 0;
+    padding: 0 !important;
+    min-width: 0;
+}
+
+/* ...as our accent pills instead of brewm's track + knob: a status dot, then the name. Off: accent underline.
+   On: accent ring, a tint of the accent, and the dot fills. The checkbox stays hidden off-screen (brewm). */
+html body #a11y input.toggle + label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em;
+    border-radius: 2rem;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    padding: 0.35em 0.8em !important;
+    height: 100%;
+    min-height: var(--lnj-dock-h);
+    text-align: center;
+    line-height: 1.2;
+    color: var(--fg);
+    font-size: var(--small);
+    font-weight: 600;
+    box-shadow: inset 0 -2px 0 0 var(--ac), 0 0 0 0 transparent;
+    cursor: pointer;
+    transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 280ms ease,
+        background-color 200ms ease;
+}
+
+html body #a11y input.toggle + label:hover,
+html body #a11y input.toggle:focus-visible + label {
+    transform: translateY(-3px);
+    box-shadow: inset 0 0 0 2px var(--ac), 0 10px 22px -10px var(--ac);
+}
+
+html body #a11y input.toggle + label:active {
+    transform: scale(0.97);
+    transition-duration: 90ms;
+}
+
+html body #a11y input.toggle:checked + label {
+    background: color-mix(in srgb, var(--ac) 16%, var(--bg));
+    box-shadow: inset 0 0 0 2px var(--ac), 0 0 0 0 transparent;
+}
+
+html body #a11y input.toggle + label::before {
+    position: static;
+    flex: none;
+    opacity: 1;
+    border-radius: 50%;
+    background: transparent;
+    width: 0.7rem;
+    height: 0.7rem;
+    box-shadow: inset 0 0 0 1.5px var(--mid);
+    content: '';
+    transition: background-color 200ms ease, box-shadow 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html body #a11y input.toggle:checked + label::before {
+    background: var(--ac);
+    box-shadow: inset 0 0 0 1.5px var(--ac), 0 0 0 4px color-mix(in srgb, var(--ac) 25%, transparent);
+}
+
+html body #a11y input.toggle + label::after {
+    content: none;
+}
+
+/* brewm's focus mode (a ⦿ toggle on article pages): not used */
+html body #focusMode {
+    display: none !important;
+}
+
+/* bottom row of the panel: About (where Save was) + RSS icon (where Reset / Close were) */
+html body #a11y-menu {
+    gap: 0.5rem;
+}
+
+.lnj-btn--wide {
+    flex: 1;
+}
+
+.lnj-btn--icon {
+    padding: 0;
+    width: var(--lnj-dock-h);
+}
+
+/* RSS icon: the arcs draw out from the dot on hover */
+.lnj-rss svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    overflow: visible;
+}
+
+.lnj-rss__dot {
+    fill: currentColor;
+}
+
+.lnj-rss__arc {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-dasharray: 26;
+    stroke-dashoffset: 0;
+}
+
+.lnj-rss:hover .lnj-rss__arc,
+.lnj-rss:focus-visible .lnj-rss__arc {
+    animation: lnj-rss-draw 900ms cubic-bezier(0.65, 0, 0.35, 1) both;
+    stroke: var(--ac);
+}
+
+.lnj-rss:hover .lnj-rss__arc--2,
+.lnj-rss:focus-visible .lnj-rss__arc--2 {
+    animation-delay: 140ms;
+}
+
+@keyframes lnj-rss-draw {
+    from { stroke-dashoffset: 26; }
+    to { stroke-dashoffset: 0; }
+}
+
+/* ------------------------------------------------------------------
+   Site search pill, in the dock row right after the gear (assets/js/lnj-search.js)
+   ------------------------------------------------------------------ */
+.lnj-search {
+    position: relative;
+    z-index: 3; /* above brewm's blur screen (also in this row) while Settings is open */
+    order: -1;
+    margin-right: auto;
+    width: 10rem;
+    min-width: 6rem;
+    transition: width 350ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* open: grows, but shrinks to fit (flex) rather than push the right-hand buttons off a phone screen */
+.lnj-search:focus-within,
+.lnj-search.is-open {
+    width: 24rem;
+}
+
+.lnj-search__input {
+    display: block;
+    border: 0;
+    border-radius: 2rem;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+    padding: 0 2.4rem 0 1.15em;
+    width: 100%;
+    height: var(--lnj-dock-h);
+    color: var(--fg);
+    font: inherit;
+    font-size: var(--small);
+    box-shadow: inset 0 -2px 0 0 var(--ac), 0 0 0 0 transparent;
+    transition: box-shadow 280ms ease;
+    -webkit-appearance: none;
+            appearance: none;
+}
+
+/* the placeholder reads like the other pill labels (.lnj-btn), not greyed out */
+.lnj-search__input::placeholder {
+    opacity: 1;
+    color: var(--fg);
+    font-weight: 600;
+}
+
+.lnj-search__input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.lnj-search__input:hover,
+.lnj-search__input:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--ac), 0 10px 22px -10px var(--ac);
+}
+
+/* results open upwards */
+.lnj-search__results {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    left: 0;
+    margin: 0;
+    border: var(--bound);
+    border-radius: 1ex;
+    background: var(--bg);
+    padding: 0.4rem;
+    width: min(28rem, calc(100vw - 2rem));
+    max-height: min(60vh, 32rem);
+    overflow-y: auto;
+    list-style: none;
+    box-shadow: 0 18px 40px -18px color-mix(in srgb, var(--fg) 45%, transparent);
+    animation: lnj-pop 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes lnj-pop {
+    from { transform: translateY(8px) scale(0.98); opacity: 0; }
+    to { transform: none; opacity: 1; }
+}
+
+.lnj-search__results a {
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.75ex;
+    padding: 0.6rem 0.75rem;
+    color: var(--fg);
+    text-decoration: none;
+    gap: 0.2rem;
+}
+
+.lnj-search__results a::after {
+    content: none !important;
+}
+
+.lnj-search__results a.is-active,
+.lnj-search__results a:hover {
+    background: color-mix(in srgb, var(--ac) 12%, transparent);
+}
+
+.lnj-search__results strong {
+    font-size: var(--small);
+}
+
+.lnj-search__results span {
+    color: color-mix(in srgb, var(--fg) 70%, transparent);
+    font-size: var(--footnotesize, 0.8em);
+    line-height: 1.5;
+}
+
+.lnj-search__results mark {
+    background: none;
+    color: var(--fg);
+    font-weight: 700;
+    text-decoration: underline 2px var(--ac);
+}
+
+.lnj-search__empty {
+    padding: 0.6rem 0.75rem;
+    color: color-mix(in srgb, var(--fg) 70%, transparent);
+    font-size: var(--small);
+}
+
+/* the "/" shortcut hint, in its own little key box, as tall as the placeholder text; box and "/" are a
+   quiet grey, like a deselected control */
+.lnj-kbd {
+    display: grid;
+    position: absolute;
+    top: calc(var(--lnj-dock-h) / 2);
+    right: 0.9rem;
+    transform: translateY(-50%);
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--mid) 60%, transparent);
+    border-radius: 0.25rem;
+    width: calc(var(--small) * 1.15);
+    height: calc(var(--small) * 1.15);
+    color: var(--mid);
+    font: 600 calc(var(--small) * 0.75)/1 var(--tt, monospace);
+    pointer-events: none;
+}
+
+.lnj-search:focus-within .lnj-kbd {
+    opacity: 0;
+}
+
+/* ------------------------------------------------------------------
+   Article header: no dead space (brewm: 1in above the article, --vskip around header and body), brewm's
+   author line and Print menu hidden. Our byline (layouts/partials/page/timestamp.html): avatar + author |
+   date in plain muted text, like the docs site, then the tags as small accent pills.
+   ------------------------------------------------------------------ */
+html body > main#page > header #menu,
+html body #main-article #doc-author {
+    display: none;
+}
+
+html body #main-article {
+    margin-top: 1.25rem;
+}
+
+html body #main-article > header {
+    margin: 0 0 1.75rem;
+    gap: 0.65rem;
+}
+
+html body #main-article > header h1 {
+    margin: 0;
+}
+
+html body #main-article #content {
+    margin-top: 0;
+}
+
+html body #main-article #content > :first-child {
+    margin-top: 0;
+}
+
+.lnj-byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    color: var(--mid);
+    font-size: var(--small);
+}
+
+/* brewm draws a 2pt accent border under every link on hover; the name gets only its own orange line,
+   under the name and only on hover */
+.lnj-byline .lnj-byline__author {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    border: 0;
+    color: var(--fg);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.lnj-byline__author::after,
+.lnj-tag::after {
+    content: none !important;
+}
+
+.lnj-byline__author > span {
+    text-decoration: underline 2px transparent;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 200ms ease;
+}
+
+.lnj-byline__author:hover > span,
+.lnj-byline__author:focus-visible > span {
+    text-decoration-color: var(--ac);
+}
+
+html body #main-article .lnj-byline__author img {
+    margin: 0;
+    border-radius: 50%;
+    width: 1.6rem;
+    height: 1.6rem;
+    object-fit: cover;
+}
+
+/* article header order: byline (author | date), title, tags, image, intro; single.html prints the title first */
+html body #main-article > header > .lnj-byline {
+    order: -1;
+}
+
+html body #main-article > header > .lnj-tags {
+    order: 1;
+}
+
+/* the post image, flush with the column like the text, then the grey intro under it */
+html body #main-article > header > .lnj-banner {
+    order: 2;
+    margin: 0.85rem 0 0;
+}
+
+html body #main-article > header > .lnj-banner > img {
+    display: block;
+    margin: 0;
+    border-radius: 1ex;
+    width: 100%;
+    height: auto;
+}
+
+html body #main-article > header > .lnj-lede {
+    order: 3;
+    margin: 0.35rem 0 0;
+    color: var(--mid);
+    font-size: 1.05em;
+    line-height: 1.55;
+}
+
+/* the "|" between author and date */
+.lnj-byline__date {
+    border-left: 1px solid color-mix(in srgb, var(--mid) 60%, transparent);
+    padding-left: 0.75rem;
+}
+
+.lnj-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+/* after the article brewm prints a rule + #contentinfo (related posts, redaction history from git); when that
+   has nothing in it (always, locally) the rule is a stray line, so hide both. :not(:has(*)) and not :empty,
+   since unminified output leaves whitespace and comments in it */
+html body #exclude > .pagewidth:has(> #contentinfo:not(:has(*))) {
+    display: none;
+}
+
+/* with related posts there, the rule itself goes: just space between the article's end card and them */
+html body #exclude > .pagewidth > hr {
+    margin: 2rem 0 0;
+    border-color: transparent;
+}
+
+/* tags: our accent buttons (.lnj-btn), a size smaller */
+.lnj-tags .lnj-tag {
+    padding: 0 0.9em;
+    height: 1.9rem;
+    font-size: var(--footnotesize, 0.8em);
+}
+
+/* ------------------------------------------------------------------
+   Page tools (layouts/partials/page-tools.html, assets/js/lnj-tools.js): fixed just right of the article
+   column (its right edge is 50% + --max-width / 2), top; a vertical stack of icon pills whose labels slide
+   out to the right. Contents is a drawer (the rail's .lnj-drawer, opening downward): its pills slide open
+   under it and push Reading mode / Print down; it stays open until clicked. Up to 1152px (no room beside the
+   column) the stack sits top right, right-aligned.
+   ------------------------------------------------------------------ */
+.lnj-tools {
+    display: flex;
+    position: fixed;
+    top: calc(var(--lnj-logo-h) + 2rem);
+    left: calc(50% + var(--max-width) / 2 + 1.5rem);
+    z-index: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.lnj-tools button.lnj-btn {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.lnj-tools .lnj-pop.is-open > .lnj-pill,
+.lnj-reading[aria-pressed="true"] {
+    background: color-mix(in srgb, var(--ac) 16%, var(--bg));
+    box-shadow: inset 0 0 0 2px var(--ac);
+}
+
+.lnj-tools .lnj-pop.is-open > .lnj-pill {
+    padding: 0 calc((var(--lnj-dock-h) - 1.2rem) / 2);
+}
+
+.lnj-tools .lnj-pop.is-open > .lnj-pill .lnj-pill__label {
+    margin: 0;
+    max-width: 0;
+    opacity: 0;
+}
+
+.lnj-tools .lnj-pop {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.lnj-tools .lnj-drawer__inner {
+    align-items: flex-start;
+}
+
+.lnj-tools .lnj-drawer__inner > :first-child {
+    margin-top: 0.5rem;
+}
+
+.lnj-tools .lnj-pop.is-open .lnj-drawer__inner > * {
+    animation: lnj-drop 420ms var(--lnj-spring, ease) backwards;
+}
+
+@keyframes lnj-drop {
+    from { transform: translateY(-0.75rem) scale(0.95); opacity: 0; }
+    to { transform: none; opacity: 1; }
+}
+
+/* the table of contents: a floating accent pill per heading (h3s indented, a size smaller), scrolling if long;
+   the current section gets the accent ring */
+.lnj-toc #TableOfContents {
+    margin: 0 -1rem;
+    padding: 0.25rem 1rem 0.75rem;
+    max-height: min(55vh, 30rem);
+    overflow-y: auto;
+}
+
+.lnj-toc #TableOfContents ul {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lnj-toc #TableOfContents ul ul {
+    margin-top: 0.4rem;
+    padding-left: 1rem;
+}
+
+.lnj-toc #TableOfContents a {
+    display: inline-flex;
+    align-items: center;
+    border: 0;
+    border-radius: 1.2rem;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    padding: 0.35em 1em;
+    max-width: clamp(10rem, calc(50vw - var(--max-width) / 2 - 3rem), 20rem);
+    min-height: 2.1rem;
+    color: var(--fg);
+    font-size: var(--small);
+    font-weight: 600;
+    line-height: 1.3;
+    text-decoration: none;
+    box-shadow: inset 0 -2px 0 0 var(--ac), 0 0 0 0 transparent;
+    -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+    transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 280ms ease,
+        background-color 200ms ease;
+}
+
+.lnj-toc #TableOfContents ul ul a {
+    min-height: 1.85rem;
+    font-size: var(--footnotesize, 0.8em);
+    font-weight: 500;
+}
+
+.lnj-toc #TableOfContents a::after {
+    content: none !important;
+}
+
+.lnj-toc #TableOfContents a:hover,
+.lnj-toc #TableOfContents a:focus-visible {
+    outline: none;
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 2px var(--ac), 0 10px 22px -12px var(--ac);
+}
+
+.lnj-toc #TableOfContents a.is-current {
+    background: color-mix(in srgb, var(--ac) 16%, var(--bg));
+    box-shadow: inset 0 0 0 2px var(--ac);
+}
+
+@media (max-width: 1152px) {
+    .lnj-tools {
+        top: 1rem;
+        right: 1rem;
+        left: auto;
+        align-items: flex-end;
+    }
+
+    .lnj-tools .lnj-pill {
+        flex-direction: row-reverse;
+    }
+
+    .lnj-tools .lnj-pill:hover,
+    .lnj-tools .lnj-pill:focus-visible {
+        padding-right: calc((var(--lnj-dock-h) - 1.2rem) / 2);
+        padding-left: 1.15em;
+    }
+
+    .lnj-tools .lnj-pill:hover .lnj-pill__label,
+    .lnj-tools .lnj-pill:focus-visible .lnj-pill__label {
+        margin-right: 0.55em;
+        margin-left: 0;
+    }
+
+    .lnj-tools .lnj-pop,
+    .lnj-tools .lnj-drawer__inner,
+    .lnj-toc #TableOfContents ul {
+        align-items: flex-end;
+    }
+
+    .lnj-toc #TableOfContents ul ul {
+        padding-right: 1rem;
+        padding-left: 0;
+    }
+
+    .lnj-toc #TableOfContents a {
+        max-width: min(18rem, calc(100vw - 4rem));
+    }
+}
+
+/* Articles: brewm keeps prose to 61.8% (--golden-ratio) of the 58rem column, leaving the rest for margin
+   notes. No post uses margin notes, so text runs the full column, as wide as the code blocks and images. */
+html body #main-article section > p,
+html body #main-article audio,
+html body #main-article #content > ul,
+html body #main-article #content > ol,
+html body #main-article #content > blockquote,
+html body #main-article .textwidth {
+    width: auto;
+}
+
+/* While reading (lnj-rail.js sets body.lnj-chrome-hidden on scroll down, clears it on a small scroll up): the
+   page tools slide up and away on every screen; on phones / tablets the rail and the gear + search row also
+   slide down and away (wide screens keep those). Only `transform: none` when shown: a transform on brewm's
+   footer would trap its fixed Settings panel. */
+.lnj-tools {
+    transition: transform 320ms cubic-bezier(0.65, 0, 0.35, 1), opacity 220ms ease;
+}
+
+body.lnj-chrome-hidden .lnj-tools {
+    opacity: 0;
+    transform: translateY(calc(-100% - 2rem));
+}
+
+body.lnj-chrome-hidden .lnj-tools,
+body.lnj-chrome-hidden .lnj-tools * {
+    pointer-events: none;
+}
+
+@media (max-width: 1152px) {
+    .lnj-rail,
+    html body > footer.pagewidth {
+        transition: transform 320ms cubic-bezier(0.65, 0, 0.35, 1), opacity 220ms ease;
+    }
+
+    body.lnj-chrome-hidden .lnj-rail,
+    body.lnj-chrome-hidden > footer.pagewidth {
+        opacity: 0;
+        transform: translateY(calc(100% + 2rem));
+    }
+
+    body.lnj-chrome-hidden .lnj-rail *,
+    body.lnj-chrome-hidden > footer.pagewidth * {
+        pointer-events: none;
+    }
+}
+
+/* Text selection in the accent colour (set in hugo.toml: params.style.*.ac) */
+::selection {
+    background: var(--ac);
+    color: var(--bg);
+}
+
+/* ------------------------------------------------------------------
+   Stage icons (taxonomy `stage`, content/stage/): brewm's animated .st badge before "x min read" on cards,
+   and in our byline. brewm draws grey garden leaves; ours are workshop machines, drawn as a mask so they take
+   the accent colour: prototype = one link sweeping on its joint (a servo test), in-progress = a two-link arm,
+   stable = a gear turning steadily. The SVGs animate themselves (and stop under reduced motion).
+   ------------------------------------------------------------------ */
+html body .st {
+    flex: none;
+    vertical-align: -0.2em;
+    margin: 0 0.5em 0 0;
+    background: var(--ac);
+    padding: 0;
+    width: 1.3em;
+    height: 1.3em;
+    -webkit-mask: var(--lnj-st) center / contain no-repeat;
+            mask: var(--lnj-st) center / contain no-repeat;
+}
+
+.st.prototype {
+    --lnj-st: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><style>@keyframes s{0%,10%,100%{transform:rotate(-55deg)}45%,55%{transform:rotate(55deg)}}g{animation:s 2.8s ease-in-out infinite;transform-origin:30px 40px}@media (prefers-reduced-motion:reduce){g{animation:none}}</style><rect x='9' y='40' width='42' height='13' rx='3' fill='none' stroke='%23000' stroke-width='5'/><g><path d='M30 40V13' stroke='%23000' stroke-width='6' stroke-linecap='round'/><circle cx='30' cy='12' r='5'/></g><circle cx='30' cy='40' r='6.5'/></svg>");
+}
+
+.st.in-progress {
+    --lnj-st: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><style>@keyframes a{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(24deg)}}@keyframes b{0%,100%{transform:rotate(25deg)}50%{transform:rotate(-38deg)}}#a{animation:a 3.2s ease-in-out infinite;transform-origin:16px 46px}#b{animation:b 3.2s ease-in-out infinite;transform-origin:16px 22px}@media (prefers-reduced-motion:reduce){#a,#b{animation:none}}path{fill:none;stroke:%23000;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}</style><path d='M4 55h24M9 55a7 7 0 0 1 14 0'/><g id='a'><path d='M16 46V22'/><g id='b'><path d='M16 22h22M44 15h-6v14h6'/><circle cx='16' cy='22' r='5'/></g></g><circle cx='16' cy='46' r='5.5'/></svg>");
+}
+
+.st.stable {
+    --lnj-st: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><style>@keyframes r{to{transform:rotate(360deg)}}g{animation:r 7s linear infinite;transform-origin:30px 30px}@media (prefers-reduced-motion:reduce){g{animation:none}}</style><g fill='none' stroke='%23000'><circle cx='30' cy='30' r='21.5' stroke-width='9' pathLength='20' stroke-dasharray='1 1'/><circle cx='30' cy='30' r='14' stroke-width='7'/><circle cx='30' cy='30' r='4' stroke-width='4.5'/></g></svg>");
+}
+
+/* cards: icon + read time read as one unit */
+.feed-item > footer .st {
+    margin-right: 0.45em;
+}
+
+/* the article shows its stage in "About this post" (layouts/partials/post/tagged.html), not brewm's row above it */
+html body #has-stage {
+    display: none;
+}
+
+/* brewm hyphenates every element; body text may, but headings, code and file names must never break mid-word
+   ("tem-plate", "in-dex.md") */
+html body :is(h1, h2, h3, h4, h5, h6, code, pre, kbd) {
+    -webkit-hyphens: manual;
+            hyphens: manual;
+}
+
+/* Article headings in bold (brewm sets every heading at 400); Inter ships 400 and 700 */
+html body #main-article #content :is(h2, h3, h4) {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* ------------------------------------------------------------------
+   Code blocks (Chroma's .highlight; a bare <pre> gets wrapped in one by assets/js/lnj-code.js): a tinted card
+   with the pills' accent underline and a Copy pill, top right, or centred on the right for a one-line block
+   (.lnj-code--one). Lines never wrap: the code scrolls sideways inside the card while the card, and so the
+   button, stays put. Syntax colours come from brewm's palette (--s4n, --t9u, ...), which follows light / dark
+   and the colour-blind modes; keywords take the accent.
+   ------------------------------------------------------------------ */
+html body main .highlight {
+    --lnj-copy: 2.1rem;
+    position: relative;
+    margin: 1.25em 0;
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, var(--fg) 5%, var(--bg));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 7%, transparent), inset 0 -2px 0 0 var(--ac);
+    overflow: hidden;
+}
+
+html body main .highlight > pre,
+html body main .highlight > pre.chroma {
+    margin: 0 0 2px; /* the scrollbar sits above the accent line */
+    padding: 0;
+    overflow-x: auto;
+    background: none !important;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--fg) 25%, transparent) transparent;
+}
+
+/* padding on the code, not the scroller, so the scrolled-to end keeps clear of the button */
+html body main .highlight pre > code {
+    display: block;
+    border-radius: 0;
+    background: none;
+    padding: 0.95rem calc(var(--lnj-copy) + 1.4rem) 0.95rem 1.15rem;
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    overflow: visible;
+    color: var(--fg);
+    white-space: pre;
+}
+
+.lnj-copy {
+    display: inline-flex;
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    z-index: 1;
+    flex-direction: row-reverse;
+    padding: 0 calc((var(--lnj-copy) - 1rem) / 2);
+    height: var(--lnj-copy);
+    font-family: var(--sf), sans-serif;
+    cursor: pointer;
+    transition: transform 280ms var(--lnj-spring), box-shadow 280ms ease,
+        padding 380ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.lnj-code--one .lnj-copy {
+    top: calc(50% - var(--lnj-copy) / 2 - 1px);
+}
+
+.lnj-copy > svg {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.lnj-copy__done,
+.lnj-copy.is-copied .lnj-copy__icon {
+    display: none;
+}
+
+.lnj-copy.is-copied .lnj-copy__done {
+    display: block;
+    color: var(--ac);
+    stroke-dasharray: 24;
+    animation: lnj-tick 360ms ease-out;
+}
+
+@keyframes lnj-tick {
+    from { stroke-dashoffset: 24; }
+}
+
+/* the label slides out to the left on hover / focus, and stays out while it says "Copied" */
+.lnj-copy:hover,
+.lnj-copy:focus-visible,
+.lnj-copy.is-copied {
+    padding-left: 0.9em;
+}
+
+.lnj-copy:hover .lnj-pill__label,
+.lnj-copy:focus-visible .lnj-pill__label,
+.lnj-copy.is-copied .lnj-pill__label {
+    margin-right: 0.45em;
+    max-width: 6em;
+    opacity: 1;
+    font-size: var(--footnotesize, 0.8em);
+    transition-delay: 0s, 0s, 120ms;
+}
+
+.lnj-copy .lnj-pill__label {
+    font-size: var(--footnotesize, 0.8em);
+}
+
+/* syntax: plain text in the text colour (brewm paints whole lines accent via .cl) */
+html body main .highlight .chroma .cl {
+    color: inherit;
+}
+
+html body main .highlight .chroma :is(.k, .kd, .kn, .kp, .kr, .kc, .kt, .gp) {
+    color: var(--ac);
+    font-weight: 700;
+}
+
+html body main .highlight .chroma :is(.nb, .bp, .nf, .fm, .nc, .nt) {
+    color: var(--s4n);
+}
+
+html body main .highlight .chroma :is(.s, .sa, .sb, .sc, .dl, .sd, .s1, .s2, .se, .sh, .si, .sx, .sr, .ss) {
+    color: var(--t9u);
+}
+
+html body main .highlight .chroma :is(.m, .mb, .mf, .mh, .mi, .il, .mo, .no, .na, .l, .ld) {
+    color: var(--y6a);
+}
+
+html body main .highlight .chroma :is(.n, .nv, .nx, .vc, .vg, .vi, .vm, .py, .nn, .nd, .nl) {
+    color: var(--y7i);
+}
+
+html body main .highlight .chroma :is(.o, .ow, .p, .w, .go) {
+    color: var(--mid);
+}
+
+html body main .highlight .chroma :is(.c, .ch, .cm, .c1, .cs, .cp, .cpf) {
+    color: var(--mid);
+    font-style: italic;
+}
+
+/* ------------------------------------------------------------------
+   About this post (layouts/partials/about-post.html, assets/js/lnj-meta.js): title, author, dates, read
+   time, level, stage, license, links and disclaimer, all from front matter. The code blocks' card (tint +
+   accent underline), brewm's letter-spaced labels and our pills. Two copies: --end, the card after the article
+   (every screen), and --side, fixed in the left gutter on wide screens (≥1280px, where the gutter fits it),
+   mirroring the page tools on the right. lnj-meta.js hands the side one over to the end card as it scrolls in.
+   .is-shown plays the entrance (rows rise in turn, the level bars charge up). Narrow (sidebar, phones): facts
+   as label / value rows; wide card: one strip of equal tiles, then links and disclaimer side by side.
+   ------------------------------------------------------------------ */
+.lnj-meta {
+    --lnj-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin: 3rem 0 1rem;
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, var(--fg) 5%, var(--bg));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 7%, transparent), inset 0 -2px 0 0 var(--ac);
+    padding: 1.15rem 1.15rem 1.35rem;
+    font-family: var(--sf), sans-serif;
+    font-size: var(--small);
+    line-height: 1.45;
+    container-type: inline-size;
+}
+
+/* brewm hyphenates every element (*); in the narrow gutter that breaks every other word */
+.lnj-meta,
+.lnj-meta * {
+    -webkit-hyphens: manual;
+            hyphens: manual;
+}
+
+.lnj-meta > *,
+.lnj-meta p {
+    margin: 0;
+}
+
+.lnj-meta a::after {
+    content: none !important; /* brewm's external-link arrow and link underline */
+}
+
+.lnj-meta__kicker,
+.lnj-meta__label,
+.lnj-meta__facts dt {
+    letter-spacing: 0.16em;
+    font-size: var(--scriptsize, 0.7em);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.lnj-meta__kicker {
+    color: var(--ac);
+}
+
+.lnj-meta__title {
+    color: var(--fg);
+    font-size: 1.2em;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+.lnj-meta .lnj-meta__author {
+    align-self: flex-start;
+    border: 0;
+    color: var(--fg);
+    font-weight: 700;
+    text-decoration: underline 2px transparent;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 200ms ease;
+}
+
+.lnj-meta__by {
+    color: var(--mid);
+    font-weight: 400;
+}
+
+.lnj-meta .lnj-meta__author:hover,
+.lnj-meta .lnj-meta__author:focus-visible,
+.lnj-meta .lnj-meta__stage:hover,
+.lnj-meta .lnj-meta__stage:focus-visible {
+    text-decoration-color: var(--ac);
+}
+
+/* the end card is a little tighter than the sidebar: it follows a whole article and shouldn't sprawl */
+.lnj-meta--end {
+    gap: 0.4rem;
+    margin: 2.25rem 0 0.5rem;
+    padding: 0.95rem 1.1rem 1.1rem;
+}
+
+.lnj-meta--end .lnj-meta__facts > div {
+    padding: 0.42rem 0;
+}
+
+.lnj-meta--end .lnj-meta__more {
+    gap: 0.85rem;
+    margin-top: 0.45rem !important;
+}
+
+.lnj-meta--end .lnj-meta__group {
+    gap: 0.4rem;
+}
+
+.lnj-meta--end .lnj-meta__link {
+    min-height: 2.1rem;
+}
+
+/* facts: label left, value right, on dashed rules like a spec sheet */
+.lnj-meta__facts {
+    margin: 0.35rem 0 0;
+    border-bottom: 1px dashed color-mix(in srgb, var(--mid) 40%, transparent);
+    padding: 0;
+}
+
+.lnj-meta__facts > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px dashed color-mix(in srgb, var(--mid) 40%, transparent);
+    padding: 0.5rem 0;
+}
+
+.lnj-meta__facts dt {
+    color: var(--mid);
+}
+
+.lnj-meta__facts dd {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    margin: 0;
+    color: var(--fg);
+    font-weight: 700;
+    text-align: right;
+}
+
+.lnj-meta .lnj-meta__stage {
+    display: inline-flex;
+    align-items: center;
+    border: 0;
+    color: var(--fg);
+    text-decoration: underline 2px transparent;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 200ms ease;
+}
+
+.lnj-meta .lnj-meta__stage .st {
+    margin-right: 0.4em;
+}
+
+/* level: three rising bars, filled up to the level */
+.lnj-level {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 0.95em;
+}
+
+.lnj-level > i {
+    border-radius: 1px;
+    background: color-mix(in srgb, var(--fg) 18%, transparent);
+    width: 0.3em;
+    height: 40%;
+    transform-origin: bottom;
+}
+
+.lnj-level > i:nth-child(2) { height: 70%; }
+.lnj-level > i:nth-child(3) { height: 100%; }
+
+.lnj-level[data-level="1"] > i:nth-child(-n + 1),
+.lnj-level[data-level="2"] > i:nth-child(-n + 2),
+.lnj-level[data-level="3"] > i {
+    background: var(--ac);
+}
+
+.lnj-meta__label {
+    color: var(--mid);
+}
+
+.lnj-meta__more,
+.lnj-meta__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.lnj-meta__more {
+    gap: 1.1rem;
+    margin-top: 0.6rem !important;
+}
+
+.lnj-meta__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lnj-meta__links li {
+    margin: 0;
+}
+
+.lnj-meta .lnj-meta__link {
+    justify-content: flex-start;
+    gap: 0.6em;
+    border-radius: 1.15rem;
+    padding: 0.5em 0.95em;
+    width: 100%;
+    height: auto;
+    min-height: 2.3rem;
+    font-size: inherit;
+    line-height: 1.25;
+    white-space: normal; /* long labels wrap in the narrow gutter instead of being cut */
+}
+
+.lnj-meta__link .icon {
+    flex: none;
+    font-size: 1.1em;
+    font-style: normal;
+}
+
+.lnj-meta__link .lnj-docs__logo {
+    width: 1.05rem;
+    height: 1.05rem;
+}
+
+.lnj-meta__link-label {
+    overflow-wrap: anywhere;
+}
+
+.lnj-meta__out {
+    flex: none;
+    margin-left: auto;
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.55;
+    transition: transform 280ms var(--lnj-spring), opacity 200ms ease;
+}
+
+.lnj-meta__link:hover .lnj-meta__out,
+.lnj-meta__link:focus-visible .lnj-meta__out {
+    color: var(--ac);
+    opacity: 1;
+    transform: translate(2px, -2px);
+}
+
+.lnj-meta__note {
+    border-left: 2px solid var(--ac);
+    padding-left: 0.75em;
+    color: var(--mid);
+    font-size: var(--footnotesize, 0.85em);
+    line-height: 1.5;
+}
+
+/* the wide card (after the article, tablets and desktop): the facts become one strip of equal tiles, label over
+   value, split by the same dashed rule (auto-fit, so 3 facts or 6 always fill the row); links and disclaimer
+   then sit side by side */
+@container (min-width: 36rem) {
+    /* every tile draws its own top and left rule; the strip is pulled left by one tile gutter and clipped
+       back, which hides the first column's left rules however the row wraps. Tiles are as wide as their value
+       and grow to fill their row (flex), so a wrapped last row still closes every rule. --lnj-tile-x scales with the card
+       (cqi) between a floor and a ceiling, so tiles never crowd and never sprawl. */
+    .lnj-meta__facts {
+        --lnj-tile-x: clamp(0.6rem, 2.2cqi, 1rem);
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0.45rem 0 0 calc(-1 * var(--lnj-tile-x));
+        border-top: 0;
+        clip-path: inset(0 0 0 var(--lnj-tile-x));
+    }
+
+    .lnj-meta__facts > div,
+    .lnj-meta--end .lnj-meta__facts > div {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 0.25rem;
+        border-top: 1px dashed color-mix(in srgb, var(--mid) 40%, transparent);
+        border-left: 1px dashed color-mix(in srgb, var(--mid) 40%, transparent);
+        flex: 1 0 auto; /* as wide as its value, then shares the row's spare room */
+        padding: 0.5rem var(--lnj-tile-x);
+        min-width: 6.5rem;
+    }
+
+    .lnj-meta__facts dd {
+        text-align: left;
+        white-space: nowrap; /* a value never breaks or overlaps the next rule; the row wraps instead */
+    }
+
+    .lnj-meta__more,
+    .lnj-meta--end .lnj-meta__more {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+        gap: 0.85rem clamp(1.25rem, 4cqi, 2.5rem);
+        margin-top: 0.6rem !important;
+    }
+
+    .lnj-meta__links {
+        flex-flow: row wrap;
+    }
+
+    .lnj-meta .lnj-meta__link {
+        width: auto;
+    }
+
+    .lnj-meta__out {
+        margin-left: 0.4em;
+    }
+}
+
+/* the end card's rows wait hidden until it builds up (lnj-meta.js arms it; without JS they're just shown) */
+.lnj-meta--armed:not(.is-shown) > * {
+    opacity: 0;
+}
+
+/* entrance: the rows rise in one after another, then the level bars charge up */
+.lnj-meta.is-shown > * {
+    animation: lnj-rise 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lnj-meta.is-shown > :nth-child(2) { animation-delay: 40ms; }
+.lnj-meta.is-shown > :nth-child(3) { animation-delay: 80ms; }
+.lnj-meta.is-shown > :nth-child(4) { animation-delay: 120ms; }
+.lnj-meta.is-shown > :nth-child(5) { animation-delay: 160ms; }
+.lnj-meta.is-shown > :nth-child(6) { animation-delay: 200ms; }
+.lnj-meta.is-shown > :nth-child(n + 7) { animation-delay: 240ms; }
+
+.lnj-meta.is-shown .lnj-level > i {
+    animation: lnj-charge 420ms var(--lnj-spring) 260ms both;
+}
+
+.lnj-meta.is-shown .lnj-level > i:nth-child(2) { animation-delay: 340ms; }
+.lnj-meta.is-shown .lnj-level > i:nth-child(3) { animation-delay: 420ms; }
+
+@keyframes lnj-rise {
+    from { opacity: 0; transform: translateY(0.6rem); }
+}
+
+@keyframes lnj-charge {
+    from { transform: scaleY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lnj-meta.is-shown > *,
+    .lnj-meta.is-shown .lnj-level > i {
+        animation: none;
+    }
+}
+
+/* the sidebar copy and its collapsed pill: only on wide screens */
+.lnj-meta--side,
+.lnj-meta-pill {
+    display: none !important;
+}
+
+/* × in the sidebar's top right corner: quiet until hovered, then the pills' accent ring */
+.lnj-meta__close {
+    display: inline-flex;
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+    z-index: 2; /* above the rows: their entrance animation leaves a transform that would lift them over it */
+    justify-content: center;
+    align-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    padding: 0;
+    width: 1.85rem;
+    height: 1.85rem;
+    color: var(--mid);
+    cursor: pointer;
+    transition: color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+
+.lnj-meta__close > svg {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 280ms var(--lnj-spring);
+}
+
+.lnj-meta__close:hover,
+.lnj-meta__close:focus-visible {
+    outline: none;
+    background: color-mix(in srgb, var(--ac) 12%, transparent);
+    color: var(--ac);
+    box-shadow: inset 0 0 0 2px var(--ac);
+}
+
+.lnj-meta__close:hover > svg,
+.lnj-meta__close:focus-visible > svg {
+    transform: rotate(90deg);
+}
+
+.lnj-meta--side .lnj-meta__kicker {
+    padding-right: 2.25rem; /* clear of the × */
+}
+
+@media (min-width: 1280px) {
+    html body .lnj-meta--side {
+        display: flex !important;
+        position: fixed;
+        top: calc(var(--lnj-logo-h) + 2rem);
+        right: calc(50% + var(--max-width) / 2 + 2.25rem);
+        z-index: 1;
+        margin: 0;
+        width: min(17rem, calc(50% - var(--max-width) / 2 - 3.25rem));
+        max-height: calc(100vh - var(--lnj-logo-h) - 7rem);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        visibility: hidden;
+        opacity: 0;
+        transform: translateX(-1.25rem);
+        transform-origin: top right;
+        transition: opacity 320ms ease, transform 420ms cubic-bezier(0.65, 0, 0.35, 1), visibility 0s 420ms;
+    }
+
+    html body .lnj-meta--side.is-shown {
+        visibility: visible;
+        opacity: 1;
+        transform: none;
+        transition-delay: 0s;
+    }
+
+    /* collapsed: it shrinks into its top right corner, where the pill takes its place (and grows back out of it) */
+    html body .lnj-meta--side.is-collapsed:not(.is-shown) {
+        transform: scale(0.15);
+    }
+
+    /* the pill: the page tools' look, right edge on the panel's, label sliding out to the left (away from the
+       text). Shown by lnj-meta.js under the same rules as the panel, only while it's collapsed. `scale`, not
+       `transform`, for the pop, so the pills' hover lift still works */
+    html body .lnj-meta-pill {
+        display: inline-flex !important;
+        position: fixed;
+        top: calc(var(--lnj-logo-h) + 2rem);
+        right: calc(50% + var(--max-width) / 2 + 2.25rem);
+        z-index: 1;
+        flex-direction: row-reverse;
+        font-family: inherit;
+        cursor: pointer;
+        visibility: hidden;
+        opacity: 0;
+        scale: 0.5;
+        pointer-events: none; /* still fading out after an expand: let clicks reach the × under it */
+        transform-origin: top right;
+        transition: transform 280ms var(--lnj-spring), box-shadow 280ms ease,
+            padding 380ms cubic-bezier(0.65, 0, 0.35, 1), opacity 200ms ease, scale 320ms var(--lnj-spring),
+            visibility 0s 320ms;
+    }
+
+    html body .lnj-meta-pill.is-shown {
+        pointer-events: auto;
+        visibility: visible;
+        opacity: 1;
+        scale: 1;
+        transition-delay: 0s, 0s, 0s, 120ms, 120ms, 0s;
+    }
+
+    html body .lnj-meta-pill:hover,
+    html body .lnj-meta-pill:focus-visible {
+        padding-right: calc((var(--lnj-dock-h) - 1.2rem) / 2);
+        padding-left: 1.15em;
+    }
+
+    html body .lnj-meta-pill:hover .lnj-pill__label,
+    html body .lnj-meta-pill:focus-visible .lnj-pill__label {
+        margin-right: 0.55em;
+        margin-left: 0;
+    }
+}
+
+/* ------------------------------------------------------------------
+   About / résumé pages (layouts/_default/about.html, resume.html): their own layout, not the article one.
+   A hero (letter-spaced accent kicker, big headline, grey subtitle, and art: the about page's two-link arm,
+   the résumé's photo), then sections titled like brewm's "Recent posts", built from the site's cards (the
+   code blocks' tint + accent underline, lifting into an accent ring on hover like the pills).
+   ------------------------------------------------------------------ */
+.lnj-page {
+    --lnj-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-top: 1rem;
+    margin-bottom: 4rem;
+    font-family: var(--sf), sans-serif;
+}
+
+/* brewm's breadcrumb row adds nothing above a hero */
+html body > main:has(.lnj-page) > header.pagewidth {
+    display: none;
+}
+
+.lnj-page p {
+    margin: 0;
+}
+
+/* brewm hyphenates every element; big headlines and short card lines read badly broken */
+.lnj-page,
+.lnj-page * {
+    -webkit-hyphens: manual;
+            hyphens: manual;
+}
+
+.lnj-page a::after {
+    content: none !important; /* brewm's external-link arrow */
+}
+
+.lnj-kicker {
+    color: var(--ac);
+    letter-spacing: 0.2em;
+    font-size: var(--footnotesize, 0.8em);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.lnj-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 0 2.25rem;
+}
+
+html body .lnj-page h1.lnj-hero__title {
+    margin: 0.4rem 0 0;
+    font-size: clamp(2.1rem, 4.6vw, 3.3rem);
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+}
+
+.lnj-hero__sub {
+    margin-top: 0.9rem !important;
+    max-width: 34rem;
+    color: var(--mid);
+    font-size: var(--large);
+    line-height: 1.45;
+}
+
+/* the about page's AMR: outlines in the text colour, wheels / lidar / LED in the accent; the road and speed lines
+   stream left while the robot surges, pitches back on the throttle and dips on the brakes (2.8s loop) */
+.lnj-hero__art {
+    width: clamp(12rem, 28vw, 19rem);
+    height: auto;
+}
+
+.lnj-amr * {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.lnj-amr__road {
+    stroke: var(--mid);
+    stroke-width: 3;
+    stroke-dasharray: 16 12;
+    animation: lnj-amr-road 0.32s linear infinite;
+}
+
+.lnj-amr__trail path {
+    stroke: var(--mid);
+    stroke-width: 4;
+    animation: lnj-amr-trail 0.7s linear infinite;
+}
+
+.lnj-amr__trail path:nth-child(2) { animation-delay: -0.25s; }
+.lnj-amr__trail path:nth-child(3) { animation-delay: -0.5s; }
+
+.lnj-amr__body,
+.lnj-amr__deck,
+.lnj-amr__lidar,
+.lnj-amr__tyre {
+    stroke: var(--fg);
+    stroke-width: 7;
+}
+
+.lnj-amr__body,
+.lnj-amr__lidar,
+.lnj-amr__tyre { fill: var(--bg); }
+.lnj-amr__deck { stroke-width: 5; }
+.lnj-amr__lidar { stroke-width: 5; }
+.lnj-amr__led { stroke: var(--ac); stroke-width: 6; }
+.lnj-amr__spokes { stroke: var(--fg); stroke-width: 3; }
+.lnj-amr__hub { fill: var(--ac); stroke: none; }
+
+.lnj-amr__scan path {
+    stroke: var(--ac);
+    stroke-width: 2.5;
+    stroke-dasharray: 4 9;
+    opacity: 0.8;
+    animation: lnj-amr-scan 0.5s linear infinite;
+}
+
+.lnj-amr__dust circle {
+    stroke: var(--mid);
+    stroke-width: 2;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: lnj-amr-dust 0.7s ease-out infinite;
+}
+
+.lnj-amr__dust circle:nth-child(2) { animation-delay: -0.35s; }
+
+.lnj-amr__wheel {
+    transform-box: view-box;
+    animation: lnj-amr-spin 0.36s linear infinite;
+}
+
+.lnj-amr__bot { animation: lnj-amr-surge 2.8s ease-in-out infinite; }
+
+.lnj-amr__pitch {
+    transform-box: view-box;
+    transform-origin: 132px 171px;
+    animation: lnj-amr-pitch 2.8s ease-in-out infinite;
+}
+
+.lnj-amr__led { animation: lnj-amr-blink 0.9s steps(2, jump-none) infinite; }
+
+@keyframes lnj-amr-road { to { stroke-dashoffset: 28; } }
+@keyframes lnj-amr-scan { to { stroke-dashoffset: -13; } }
+@keyframes lnj-amr-spin { to { transform: rotate(360deg); } }
+@keyframes lnj-amr-blink { 50% { opacity: 0.35; } }
+
+@keyframes lnj-amr-trail {
+    0% { transform: translateX(24px); opacity: 0; }
+    25% { opacity: 1; }
+    100% { transform: translateX(-36px); opacity: 0; }
+}
+
+@keyframes lnj-amr-dust {
+    0% { transform: translate(0, 0) scale(0.6); opacity: 0.9; }
+    100% { transform: translate(-26px, -8px) scale(1.6); opacity: 0; }
+}
+
+@keyframes lnj-amr-surge {
+    0%, 100% { transform: translateX(-8px); }
+    45% { transform: translateX(12px); }
+    60% { transform: translateX(10px); }
+}
+
+@keyframes lnj-amr-pitch {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-3deg); }
+    45% { transform: rotate(0deg); }
+    55% { transform: rotate(2deg); }
+    70% { transform: rotate(0deg); }
+}
+
+/* AMR Easter egg (assets/js/lnj-amr.js, every page): type "vroom", or click the About hero robot. The overlay sits above
+   everything and takes no clicks, so the page underneath never moves; the robot is a CSS 3D box of SVG faces */
+.lnj-amr {
+    cursor: pointer;
+    transition: opacity 0.4s;
+}
+
+.lnj-amr.is-out {
+    opacity: 0;
+    transition: opacity 0.12s;
+}
+
+.lnj-amr3d-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s;
+}
+
+.lnj-amr3d-stage.is-leaving { opacity: 0; }
+
+.lnj-amr3d-stage canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.lnj-amr3d,
+.lnj-amr3d-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.lnj-amr3d { transform-style: preserve-3d; }
+
+.lnj-amr3d-shadow {
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.32), transparent);
+}
+
+.lnj-amr3d__face {
+    position: absolute;
+    backface-visibility: hidden;
+}
+
+.lnj-amr3d__face svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.lnj-amr3d__face svg.is-mirrored { transform: scaleX(-1); }
+
+.lnj-amr3d__body,
+.lnj-amr3d__lidar,
+.lnj-amr3d__tyre {
+    fill: var(--bg);
+    stroke: var(--fg);
+    stroke-width: 5;
+    stroke-linejoin: round;
+}
+
+.lnj-amr3d__deck,
+.lnj-amr3d__spokes {
+    fill: none;
+    stroke: var(--fg);
+    stroke-width: 3;
+}
+
+.lnj-amr3d__led {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 6;
+    stroke-linecap: round;
+}
+
+.lnj-amr3d__led { animation: lnj-amr-blink 0.9s steps(2, jump-none) infinite; }
+.lnj-amr3d__hub { fill: var(--ac); }
+.lnj-amr3d__wheel { transform-box: view-box; }
+
+/* its eyes, on the front face only: plain accent shapes, anime style, one mood at a time (lnj-amr.js picks the
+   mood and slides the eyes about as it looks around) */
+.lnj-amr3d__ink { fill: var(--ac); }
+
+.lnj-amr3d__line {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.lnj-amr3d__spin {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: lnj-amr-spin 1.1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lnj-amr * {
+        animation: none !important;
+    }
+}
+
+.lnj-page__prose {
+    max-width: 46rem;
+    font-size: var(--large);
+    line-height: 1.7;
+}
+
+.lnj-page__prose p + p {
+    margin-top: 1em;
+}
+
+.lnj-page__section {
+    margin-top: 3rem;
+}
+
+html body .lnj-page h2.lnj-section-title {
+    margin: 0 0 1.1rem;
+    letter-spacing: 0.2em;
+    font-size: var(--normalsize, 1em);
+    font-style: normal;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* cards: a link each */
+.lnj-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+    gap: 0.9rem;
+}
+
+.lnj-page .lnj-card,
+.lnj-person {
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, var(--fg) 5%, var(--bg));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 7%, transparent), inset 0 -2px 0 0 var(--ac);
+}
+
+.lnj-page .lnj-card {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 0;
+    padding: 1.15rem 1.2rem 1.3rem;
+    color: var(--fg);
+    text-decoration: none;
+    transition: transform 280ms var(--lnj-spring), box-shadow 280ms ease;
+}
+
+.lnj-page .lnj-card:hover,
+.lnj-page .lnj-card:focus-visible {
+    outline: none;
+    transform: translateY(-3px);
+    box-shadow: inset 0 0 0 2px var(--ac), 0 10px 22px -10px var(--ac);
+}
+
+.lnj-card__icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.2rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--ac) 14%, transparent);
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--ac);
+}
+
+.lnj-card__icon svg,
+.lnj-card__icon .lnj-docs__logo {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.lnj-card__icon .icon {
+    font-size: 1.2rem;
+    font-style: normal;
+}
+
+.lnj-card__title {
+    display: inline-flex;
+    align-items: center;
+    padding-right: 1.5rem;
+    font-size: 1.12em;
+    font-weight: 700;
+}
+
+.lnj-card__title .st {
+    margin-right: 0.5em;
+}
+
+.lnj-card__text {
+    color: var(--mid);
+    font-size: var(--small);
+    line-height: 1.5;
+}
+
+.lnj-card__go {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--mid);
+    transition: transform 280ms var(--lnj-spring), color 200ms ease;
+}
+
+.lnj-card:hover .lnj-card__go,
+.lnj-card:focus-visible .lnj-card__go {
+    color: var(--ac);
+    transform: translateX(3px);
+}
+
+/* the writing guide: one wide card, icon | title + text | call to action */
+.lnj-page .lnj-card--wide {
+    display: grid;
+    grid-template-areas: "icon title cta" "icon text cta";
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.3rem 1.1rem;
+}
+
+.lnj-card--wide .lnj-card__icon { grid-area: icon; margin: 0; }
+.lnj-card--wide .lnj-card__title { grid-area: title; }
+.lnj-card--wide .lnj-card__text { grid-area: text; }
+
+.lnj-card__cta {
+    display: inline-flex;
+    grid-area: cta;
+    align-items: center;
+    gap: 0.4em;
+    color: var(--ac);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.lnj-card__cta svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    transition: transform 280ms var(--lnj-spring);
+}
+
+.lnj-card--wide:hover .lnj-card__cta svg,
+.lnj-card--wide:focus-visible .lnj-card__cta svg {
+    transform: translateX(3px);
+}
+
+/* a person: the cut-out photo on an accent disc, then name, role, bio and buttons */
+.lnj-person {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1.6rem;
+    padding: 1.4rem;
+}
+
+.lnj-person__photo {
+    display: block;
+    flex: none;
+    overflow: hidden;
+    border: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--ac) 34%, var(--bg)), color-mix(in srgb, var(--ac) 10%, var(--bg)) 72%);
+    width: 9.5rem;
+    aspect-ratio: 1;
+}
+
+html body .lnj-person__photo img {
+    display: block;
+    margin: 0;
+    border-radius: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+}
+
+.lnj-person__photo--hero {
+    width: clamp(9rem, 22vw, 14.5rem);
+    box-shadow: 0 0 0 6px var(--bg), 0 0 0 8px color-mix(in srgb, var(--ac) 45%, transparent);
+}
+
+.lnj-person__name {
+    font-size: 1.45em;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.lnj-person__role {
+    margin-top: 0.15rem !important;
+    color: var(--ac);
+    letter-spacing: 0.14em;
+    font-size: var(--footnotesize, 0.8em);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.lnj-person__bio {
+    margin-top: 0.7rem !important;
+    line-height: 1.65;
+}
+
+.lnj-person__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.lnj-page .lnj-btn {
+    gap: 0.5em;
+    border: 0;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.lnj-page .lnj-btn svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.lnj-page .lnj-btn .icon {
+    font-size: 1.05rem;
+    font-style: normal;
+}
+
+.lnj-page .lnj-btn--accent,
+html body #a11y-menu .lnj-btn--accent {
+    background: var(--ac);
+    color: var(--bg);
+    box-shadow: 0 0 0 0 transparent;
+}
+
+/* résumé / author page: wider than an article (brewm's column is --max-width, 58rem), so the skills breathe */
+html body:has(#lnj-resume) {
+    --max-width: 72rem;
+}
+
+/* brewm computes the gutter (--void) once on :root from :root's --max-width, so recompute it here */
+@media (min-width: 1025px) {
+    html body:has(#lnj-resume) {
+        --void: max(2rem, calc((100vw - var(--max-width) - 1rem) / 2)) !important;
+    }
+}
+
+/* the contact line for paper only (partials/contact-buttons.html) */
+.lnj-contact__print {
+    display: none;
+}
+
+/* résumé: a photo hero, then experience + projects beside skills + education */
+.lnj-hero--person {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2.25rem;
+}
+
+.lnj-resume__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    gap: 0 3.25rem;
+}
+
+.lnj-resume__side .lnj-page__section:first-child,
+.lnj-resume__main .lnj-page__section:first-child {
+    margin-top: 2.5rem;
+}
+
+.lnj-cards--list {
+    grid-template-columns: 1fr;
+}
+
+/* experience: one long link with a joint per job; the current one's joint pulses */
+.lnj-timeline {
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 1.9rem;
+    list-style: none;
+}
+
+.lnj-timeline::before {
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: 0.45rem;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--fg) 16%, transparent);
+    width: 4px;
+    content: "";
+}
+
+.lnj-timeline__item {
+    position: relative;
+    margin: 0;
+    padding: 0 0 1.75rem;
+}
+
+.lnj-timeline__item:last-child {
+    padding-bottom: 0;
+}
+
+.lnj-timeline__item::before,
+.lnj-timeline__item:first-child::after {
+    position: absolute;
+    top: 0.1rem;
+    left: calc(-1.9rem + 0.47rem + 2px - 0.6rem);
+    border-radius: 50%;
+    width: 1.2rem;
+    height: 1.2rem;
+    content: "";
+}
+
+.lnj-timeline__item::before {
+    z-index: 1;
+    background: radial-gradient(circle, var(--bg) 0 26%, var(--ac) 29%);
+    box-shadow: 0 0 0 4px var(--bg);
+}
+
+.lnj-timeline__item:first-child::after {
+    border: 2px solid var(--ac);
+    animation: lnj-pulse 2.4s ease-out infinite;
+}
+
+@keyframes lnj-pulse {
+    from { opacity: 0.8; transform: scale(1); }
+    to { opacity: 0; transform: scale(2.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lnj-timeline__item:first-child::after {
+        animation: none;
+        opacity: 0;
+    }
+}
+
+.lnj-timeline__when {
+    color: var(--mid);
+    letter-spacing: 0.12em;
+    font-size: var(--scriptsize, 0.72em);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.lnj-timeline__role {
+    margin-top: 0.25rem !important;
+    font-size: 1.15em;
+    font-weight: 700;
+}
+
+.lnj-timeline__org a,
+.lnj-timeline__org {
+    color: var(--ac);
+    font-weight: 600;
+}
+
+.lnj-timeline__text {
+    margin-top: 0.4rem !important;
+    line-height: 1.6;
+}
+
+.lnj-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* skill chips: quiet outlined pills; the primary ones (--core) are the solid accent ones */
+html body .lnj-chips li {
+    margin: 0;
+    border-radius: 2rem;
+    background: none;
+    padding: 0.2em 0.75em;
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ac) 40%, transparent);
+    font-size: var(--footnotesize, 0.8em);
+    font-weight: 600;
+}
+
+.lnj-skill + .lnj-skill {
+    margin-top: 1.1rem;
+}
+
+.lnj-skill__group {
+    color: var(--mid);
+    letter-spacing: 0.14em;
+    font-size: var(--scriptsize, 0.72em);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+@media (max-width: 860px) {
+    .lnj-resume__grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .lnj-hero,
+    .lnj-hero--person {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.25rem;
+    }
+
+    .lnj-hero__art {
+        order: -1;
+        justify-self: end;
+        margin-bottom: -1rem;
+        width: 9rem;
+    }
+
+    .lnj-person {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: start;
+    }
+
+    .lnj-person__photo {
+        width: 7.5rem;
+    }
+
+    .lnj-page .lnj-card--wide {
+        grid-template-areas: "icon" "title" "text" "cta";
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: start;
+    }
+
+    .lnj-card--wide .lnj-card__cta {
+        margin-top: 0.4rem;
+    }
+}
+
+/* primary skills: the big chips right under the résumé hero, outlined in the accent */
+.lnj-core {
+    margin-top: 0.25rem;
+}
+
+html body .lnj-core h2.lnj-skill__group {
+    margin: 0 0 0.55rem;
+    font-style: normal;
+}
+
+/* the side column's education title, a step down from a job title */
+.lnj-resume__side .lnj-timeline__role {
+    font-size: 1em;
+    line-height: 1.35;
+}
+
+html body .lnj-chips--core {
+    gap: 0.5rem;
+    margin: 0;
+}
+
+html body .lnj-chips--core li {
+    background: var(--ac);
+    padding: 0.4em 1em;
+    box-shadow: none;
+    color: var(--bg);
+    font-size: var(--small);
+    font-weight: 700;
+}
+
+/* contact buttons (partials/contact-buttons.html): the first one filled, a few labelled, the rest icon pills */
+.lnj-contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.1rem;
+}
+
+.lnj-resume__profile p {
+    max-width: 46rem;
+    line-height: 1.7;
+}
+
+.lnj-timeline__note {
+    margin-top: 0.15rem !important;
+    color: var(--mid);
+    font-size: var(--small);
+    font-style: italic;
+}
+
+html body .lnj-timeline__points {
+    margin: 0.5rem 0 0;
+    padding-left: 1.1rem;
+}
+
+html body .lnj-timeline__points li {
+    margin: 0.3rem 0 0;
+    padding-left: 0.2rem;
+    font-size: 0.95em;
+    line-height: 1.55;
+}
+
+.lnj-timeline__points li::marker {
+    color: var(--ac);
+}
+
+.lnj-cards--two {
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+/* a project card without a link: same card, no lift */
+.lnj-page .lnj-card--static:hover {
+    transform: none;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 7%, transparent), inset 0 -2px 0 0 var(--ac);
+}
+
+.lnj-card--static .lnj-card__title {
+    padding-right: 0;
+}
+
+/* an author's posts: title left, category + date right, on dashed rules like the spec sheet */
+html body .lnj-writing {
+    margin: 0;
+    border-bottom: 1px dashed color-mix(in srgb, var(--mid) 40%, transparent);
+    padding: 0;
+    list-style: none;
+}
+
+html body .lnj-writing li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.2rem 1rem;
+    margin: 0;
+    border-top: 1px dashed color-mix(in srgb, var(--mid) 40%, transparent);
+    padding: 0.6rem 0;
+}
+
+.lnj-page .lnj-writing a {
+    border: 0;
+    color: var(--fg);
+    font-weight: 700;
+    text-decoration: underline 2px transparent;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 200ms ease;
+}
+
+.lnj-page .lnj-writing a:hover,
+.lnj-page .lnj-writing a:focus-visible {
+    text-decoration-color: var(--ac);
+}
+
+.lnj-writing span {
+    color: var(--mid);
+    font-size: var(--small);
+    white-space: nowrap;
+}
+
+html body .lnj-resume__list {
+    margin: 0;
+    padding-left: 1.1rem;
+}
+
+html body .lnj-resume__list li {
+    margin: 0 0 0.6rem;
+    font-size: var(--small);
+    line-height: 1.5;
+}
+
+.lnj-resume__list li::marker {
+    color: var(--ac);
+}
+
+.lnj-resume__end .lnj-contact {
+    margin-top: 0;
+}
+
+/* the résumé on paper (Save as PDF): the same look on A4. Light palette and backgrounds forced (even when the
+   site is in dark mode, and whatever the browser's "background graphics" setting), no site chrome, buttons swapped
+   for a line of addresses, a smaller photo and type, and nothing split across a page break. brewm's print.css
+   shrinks the type, adds page margins on body and hides .st icons; undone here, for this page only. */
+@media print {
+    @page {
+        size: A4;
+        margin: 11mm 12mm 12mm;
+    }
+
+    html:has(#lnj-resume) {
+        font-size: 8.6pt;
+    }
+
+    html body:has(#lnj-resume) {
+        --bg: #ffffff !important;
+        --fg: #1b1b1b !important;
+        --ac: #b34700 !important;
+        --mid: #5f5a55 !important;
+        margin: 0 !important;
+        background: #fff !important;
+        color: var(--fg);
+        -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+    }
+
+    html body:has(#lnj-resume) > :not(main),
+    html body > main:has(#lnj-resume) #exclude,
+    .lnj-resume__end,
+    .lnj-rail,
+    .lnj-tools,
+    .lnj-contact .lnj-btn,
+    .lnj-timeline__item:first-child::after {
+        display: none !important;
+    }
+
+    #lnj-resume.lnj-page {
+        margin: 0;
+        padding: 0;
+        max-width: none;
+    }
+
+    #lnj-resume .lnj-hero {
+        gap: 1.5rem;
+        padding: 0 0 0.9rem;
+    }
+
+    #lnj-resume .lnj-person__photo--hero {
+        margin: 6px; /* its ring is drawn outside the box; keep it inside the printable area */
+        width: 7.5rem;
+        box-shadow: 0 0 0 3px #fff, 0 0 0 4.5px color-mix(in srgb, var(--ac) 45%, transparent);
+    }
+
+    #lnj-resume h1.lnj-hero__title {
+        font-size: 2.5rem;
+    }
+
+    #lnj-resume .lnj-hero__sub {
+        margin-top: 0.4rem !important;
+        max-width: none;
+        font-size: 1.1rem;
+    }
+
+    #lnj-resume .lnj-contact {
+        margin-top: 0.6rem;
+    }
+
+    /* the addresses as a tidy two-column list: a small label, then the address, never broken mid-way */
+    #lnj-resume ul.lnj-contact__print {
+        display: grid;
+        grid-template-columns: repeat(2, max-content);
+        gap: 0.3rem 2rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        color: var(--fg);
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    #lnj-resume .lnj-contact__print li {
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    #lnj-resume .lnj-contact__print a {
+        border: 0;
+        color: var(--fg);
+        text-decoration: underline 1px color-mix(in srgb, var(--ac) 55%, transparent);
+        text-underline-offset: 2px;
+    }
+
+    #lnj-resume .lnj-contact__print span {
+        width: 4.6rem;
+        color: var(--ac);
+        letter-spacing: 0.14em;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    #lnj-resume .lnj-page__section,
+    #lnj-resume .lnj-resume__main .lnj-page__section:first-child,
+    #lnj-resume .lnj-resume__side .lnj-page__section:first-child {
+        margin-top: 1.3rem;
+    }
+
+    #lnj-resume h2.lnj-section-title {
+        margin-bottom: 0.6rem;
+    }
+
+    /* Firefox can't split a grid across pages: it pushes the whole grid to the next page and clips it there.
+       Floats split cleanly in Firefox and Chrome alike, so on paper the columns and the project cards float */
+    #lnj-resume .lnj-resume__grid {
+        display: flow-root;
+    }
+
+    #lnj-resume .lnj-resume__main {
+        float: left;
+        width: calc(100% - 16.75rem);
+    }
+
+    #lnj-resume .lnj-resume__side {
+        float: right;
+        width: 15rem;
+    }
+
+    #lnj-resume .lnj-cards {
+        display: flow-root;
+    }
+
+    #lnj-resume .lnj-cards > .lnj-card {
+        float: left;
+        margin: 0 0.9rem 0.9rem 0;
+        width: calc(50% - 0.45rem);
+    }
+
+    #lnj-resume .lnj-cards > .lnj-card:nth-child(odd) {
+        clear: left;
+    }
+
+    #lnj-resume .lnj-cards > .lnj-card:nth-child(even),
+    #lnj-resume .lnj-cards--list > .lnj-card {
+        margin-right: 0;
+    }
+
+    #lnj-resume .lnj-cards--list > .lnj-card {
+        clear: left;
+        width: 100%;
+    }
+
+    #lnj-resume .st {
+        display: inline-block;
+    }
+
+    #lnj-resume .lnj-page__prose,
+    #lnj-resume .lnj-resume__profile p,
+    #lnj-resume .lnj-timeline__points li,
+    #lnj-resume .lnj-timeline__text {
+        font-size: 1rem;
+        line-height: 1.55;
+    }
+
+    /* a CV doesn't list blog posts */
+    #lnj-resume section:has(> .lnj-writing) {
+        display: none;
+    }
+
+    #lnj-resume .lnj-timeline__item {
+        padding-bottom: 0.9rem;
+    }
+
+    #lnj-resume .lnj-card {
+        padding: 0.7rem 0.85rem 0.8rem;
+    }
+
+    #lnj-resume .lnj-card__go {
+        display: none;
+    }
+
+    #lnj-resume .lnj-timeline__item,
+    #lnj-resume .lnj-card,
+    #lnj-resume .lnj-skill,
+    #lnj-resume .lnj-writing li,
+    #lnj-resume .lnj-resume__list li {
+        break-inside: avoid;
+    }
+
+    #lnj-resume h2 {
+        break-after: avoid;
+    }
+}
+
+/* ------------------------------------------------------------------
+   Footer (layouts/partials/main/footer.html, text in content/essentials/footer.md): one tinted card like the
+   About cards instead of brewm's black two-column bar. Logo + blurb on the left, link pills on the right
+   (stacked on narrow screens), then copyright and the social icon pills under a hairline. It keeps clear of the
+   floating dock: the bottom margin clears the gear + search row, and both sides leave the right-hand rail's lane
+   (its 1rem offset + pill + a gap), so the card stays centred. Phones are too narrow for that: there it's full
+   width and the bottom margin clears the whole rail stack (--lnj-rail-n pills, counted with :has) instead.
+   ------------------------------------------------------------------ */
+html body #main-footer.lnj-footer {
+    --lnj-rail-lane: calc(1rem + var(--lnj-dock-h) + 0.75rem);
+    margin: 3rem auto calc(var(--lnj-dock-h) + var(--lnj-dock-bottom) + 1.25rem);
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, var(--fg) 5%, var(--bg));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 7%, transparent), inset 0 -2px 0 0 var(--ac);
+    padding: 2.25rem 2.5rem 1.5rem;
+    width: calc(100% - 2 * var(--lnj-rail-lane)); /* page width, less the rail's lane on both sides */
+    color: var(--fg);
+    font-family: var(--sf), sans-serif;
+}
+
+/* brewm pads its footer's columns out to the page gutter (sideways only: our rows keep their own top padding)
+   and gives every footer link 2pt of padding (which would squash the pills) */
+#main-footer.lnj-footer > div {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+#main-footer.lnj-footer a {
+    margin: 0;
+    color: var(--fg);
+}
+
+#main-footer.lnj-footer .lnj-btn {
+    padding: 0 1.15em;
+}
+
+#main-footer.lnj-footer .lnj-btn--icon {
+    padding: 0;
+}
+
+/* brewm hyphenates every element */
+#main-footer.lnj-footer * {
+    -webkit-hyphens: manual;
+            hyphens: manual;
+}
+
+#main-footer.lnj-footer a::after {
+    content: none !important; /* brewm's external-link arrow */
+}
+
+.lnj-footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem 2rem;
+}
+
+.lnj-footer__about {
+    display: flex;
+    flex: 1 1 18rem;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+/* the lockup as a mask, so it takes the text colour in both themes */
+#main-footer .lnj-footer__logo {
+    display: block;
+    border: 0;
+    background: currentColor;
+    width: 12rem;
+    aspect-ratio: 3272 / 776;
+    -webkit-mask: url("/images/brand/lnj-studios-ink.svg") left center / contain no-repeat;
+            mask: url("/images/brand/lnj-studios-ink.svg") left center / contain no-repeat;
+}
+
+.lnj-footer__text p {
+    margin: 0;
+    max-width: 30rem;
+    line-height: 1.5;
+}
+
+/* the second paragraph (no cookies, no analytics) is the small print */
+.lnj-footer__text p + p {
+    margin-top: 0.35rem;
+    color: var(--mid);
+    font-size: var(--small);
+}
+
+.lnj-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+}
+
+.lnj-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
+    padding-top: 1rem;
+}
+
+html body #main-footer .lnj-footer__legal {
+    margin: 0;
+    color: var(--mid);
+    font-size: var(--footnotesize, 0.8em);
+}
+
+.lnj-footer__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.lnj-footer__social .icon {
+    font-size: 1.1rem;
+}
+
+/* desktop home: the footer is in the right pane only, and the dock's gear, search and slide buttons are all in the
+   left pane, so nothing needs clearing below it: its bottom edge sits on the dock's line instead, level with the
+   bottom of the dock pills and the rail's lowest pill (the rail keeps its lane beside it) */
+@media (min-width: 1153px) {
+    html body > main#home #main-footer.lnj-footer {
+        margin-bottom: var(--lnj-dock-bottom);
+    }
+}
+
+@media (max-width: 640px) {
+    /* how many pills the rail stacks: back-to-top + Links & Docs on home, + Categories, Share, Home elsewhere */
+    body {
+        --lnj-rail-n: 4;
+    }
+
+    body:has(.lnj-rail > :nth-child(2):last-child) {
+        --lnj-rail-n: 2;
+    }
+
+    body:has(.lnj-rail > :nth-child(3):last-child) {
+        --lnj-rail-n: 3;
+    }
+
+    html body #main-footer.lnj-footer {
+        margin-bottom: calc(var(--lnj-dock-bottom) + var(--lnj-rail-n) * var(--lnj-dock-h)
+            + (var(--lnj-rail-n) - 1) * 0.5rem + 1rem);
+        width: calc(100% - 2.5rem); /* the phones' 1.25rem text gutter */
+        padding: 1.25rem 1.1rem 1rem;
+    }
+
+    .lnj-footer__links {
+        justify-content: flex-start;
+    }
+}
+
+/* ------------------------------------------------------------------
+   404 page (layouts/404.html, text in content/essentials/404.md): "4 0 4" with the LnJ mark as the 0, one
+   endless 8 s loop that every part keeps time with (the sweep turns 4 times a loop). Each moving part sits in a
+   group translated to its pivot, so its animation turns about 0 0: the joint and link about their centres, the
+   joint's squash, the mark and the 4s about their feet. Keyframes sit only at turning points (eased sine in
+   between); a leap is a real arc: x steady (linear), y easing out to the top and in to the ground, spin steady.
+   Timeline: 0-7.5% rest, -17.5% wobble loose, -21% crouch, -34% leap behind the right 4, -40% settle,
+   -57.5% peek out and look about, -66% crouch, -79% leap home (click), -92% the mark hops, then the 4s.
+   With reduced motion it's a still logo.
+   ------------------------------------------------------------------ */
+#lnj-404 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.4rem;
+    text-align: center;
+}
+
+.lnj-404__art {
+    margin-top: 1rem;
+    width: min(100%, 38rem);
+    height: auto;
+    overflow: visible;
+}
+
+.lnj-404__four {
+    fill: var(--fg);
+    font: 700 980px var(--sf), sans-serif;
+}
+
+.lnj-404__link path { fill: var(--fg); }
+.lnj-404__joint { fill: var(--ac); }
+
+.lnj-404__radar > circle {
+    fill: none;
+    stroke: var(--fg);
+    stroke-opacity: 0.09;
+    stroke-width: 4;
+    stroke-dasharray: 4 22;
+    stroke-linecap: round;
+}
+
+.lnj-404__sweep {
+    fill: var(--ac);
+    animation: lnj-404-sweep 2s linear infinite;
+}
+
+.lnj-404__blips circle {
+    fill: var(--ac);
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: lnj-404-blip 2s ease-out infinite;
+}
+
+.lnj-404__floor {
+    fill: none;
+    stroke: var(--fg);
+    stroke-opacity: 0.2;
+    stroke-width: 6;
+    stroke-dasharray: 2 26;
+    stroke-linecap: round;
+}
+
+.lnj-404__shadow {
+    fill: var(--fg);
+    opacity: 0;
+}
+
+.lnj-404__click {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 10;
+    opacity: 0;
+}
+
+.lnj-404__scan,
+.lnj-404__jx,
+.lnj-404__jy,
+.lnj-404__js,
+.lnj-404__jr,
+.lnj-404__shadow,
+.lnj-404__link,
+.lnj-404__mark,
+.lnj-404__four,
+.lnj-404__click {
+    animation: 8s cubic-bezier(0.37, 0, 0.63, 1) infinite; /* ease in-out sine */
+}
+
+.lnj-404__scan { animation-name: lnj-404-scan; }
+.lnj-404__jx { animation-name: lnj-404-jx; }
+.lnj-404__jy { animation-name: lnj-404-jy; }
+.lnj-404__js { animation-name: lnj-404-js; }
+.lnj-404__jr { animation-name: lnj-404-jr; }
+.lnj-404__shadow { animation-name: lnj-404-shadow; }
+.lnj-404__link { animation-name: lnj-404-link; }
+.lnj-404__mark { animation-name: lnj-404-mark; }
+.lnj-404__four--l { animation-name: lnj-404-four-l; }
+.lnj-404__four--r { animation-name: lnj-404-four-r; }
+.lnj-404__click { animation-name: lnj-404-click; }
+
+@keyframes lnj-404-sweep { to { transform: rotate(360deg); } }
+
+@keyframes lnj-404-blip {
+    0% { opacity: 0.95; transform: scale(1.8); }
+    55%, 100% { opacity: 0; transform: scale(1); }
+}
+
+/* the scan fades in as the joint leaves and out as it seats */
+@keyframes lnj-404-scan {
+    0%, 19% { opacity: 0; }
+    26%, 72% { opacity: 1; }
+    80%, 100% { opacity: 0; }
+}
+
+/* joint, across: steady in flight (linear), a little skid on landing, then the sidestep out to peek and back */
+@keyframes lnj-404-jx {
+    0%, 21.25% { transform: translateX(0); animation-timing-function: linear; }
+    33.75% { transform: translateX(632px); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+    37.5%, 40% { transform: translateX(648px); }
+    44%, 53% { transform: translateX(800px); }
+    57.5%, 66.25% { transform: translateX(648px); animation-timing-function: linear; }
+    78.75%, 100% { transform: translateX(0); }
+}
+
+/* joint, up and down: gravity (ease-out quad to the top, ease-in quad back down) */
+@keyframes lnj-404-jy {
+    0%, 21.25% { transform: translateY(0); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    27.5% { transform: translateY(-520px); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    33.75%, 66.25% { transform: translateY(0); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    72.5% { transform: translateY(-580px); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    78.75%, 100% { transform: translateY(0); }
+}
+
+/* joint, squash and stretch about its feet: crouch, stretch on take-off and while falling, squash on landing */
+@keyframes lnj-404-js {
+    0%, 17.5% { transform: scale(1, 1); }
+    20% { transform: scale(1.1, 0.86); }
+    21.25% { transform: scale(0.94, 1.08); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    25% { transform: scale(1, 1); }
+    31% { transform: scale(0.97, 1.04); animation-timing-function: linear; }
+    33.75% { transform: scale(1, 1); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+    35% { transform: scale(1.12, 0.85); }
+    37.5% { transform: scale(0.97, 1.03); }
+    39.5%, 62.5% { transform: scale(1, 1); }
+    65% { transform: scale(1.1, 0.86); }
+    66.25% { transform: scale(0.94, 1.08); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    70% { transform: scale(1, 1); }
+    76% { transform: scale(0.97, 1.04); }
+    78.75%, 100% { transform: scale(1, 1); }
+}
+
+/* joint, spin: a decaying wobble, one steady turn per leap (720deg = 0deg, so the loop is seamless), and a
+   lean out and a look each way while peeking */
+@keyframes lnj-404-jr {
+    0%, 7.5% { transform: rotate(0deg); }
+    9.5% { transform: rotate(9deg); }
+    11.5% { transform: rotate(-7deg); }
+    13.5% { transform: rotate(5deg); }
+    15.5% { transform: rotate(-2.5deg); }
+    17.5%, 21.25% { transform: rotate(0deg); animation-timing-function: linear; }
+    33.75%, 40% { transform: rotate(360deg); }
+    44% { transform: rotate(370deg); }
+    48.5% { transform: rotate(350deg); }
+    53% { transform: rotate(368deg); }
+    57.5%, 66.25% { transform: rotate(360deg); animation-timing-function: linear; }
+    78.75%, 100% { transform: rotate(720deg); }
+}
+
+/* its shadow: shows once it's off its seat, shrinks and fades as it rises (same arcs as lnj-404-jy) */
+@keyframes lnj-404-shadow {
+    0%, 17.5% { opacity: 0; transform: scale(1); }
+    21.25% { opacity: 0.16; transform: scale(1); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    27.5% { opacity: 0.05; transform: scale(0.45); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    33.75%, 66.25% { opacity: 0.16; transform: scale(1); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    72.5% { opacity: 0.05; transform: scale(0.45); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    78.75% { opacity: 0.16; transform: scale(1); }
+    82%, 100% { opacity: 0; transform: scale(1); }
+}
+
+/* the link: recoils as the joint pushes off, turns to watch it, nods at the peek, follows it back overhead */
+@keyframes lnj-404-link {
+    0%, 17.5% { transform: rotate(0deg); }
+    22.5% { transform: rotate(-7deg); }
+    31% { transform: rotate(12deg); }
+    48.5% { transform: rotate(8deg); }
+    57.5%, 64% { transform: rotate(12deg); }
+    75% { transform: rotate(-6deg); }
+    80.5%, 100% { transform: rotate(0deg); }
+}
+
+/* the whole mark, about its feet: takes the joint's landing, hops, lands, settles */
+@keyframes lnj-404-mark {
+    0%, 78.75% { transform: translateY(0) scale(1, 1); }
+    80.5% { transform: translateY(0) scale(1.07, 0.92); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    84% { transform: translateY(-70px) scale(0.97, 1.04); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    87.5% { transform: translateY(0) scale(1.06, 0.94); }
+    90% { transform: translateY(0) scale(0.99, 1.01); }
+    92%, 100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* the click as the joint seats */
+@keyframes lnj-404-click {
+    0%, 78.5% { opacity: 0; transform: scale(0.3); }
+    78.75% { opacity: 0.9; transform: scale(0.4); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+    87%, 100% { opacity: 0; transform: scale(2.4); }
+}
+
+/* the 4s, about their feet: the left leans in to watch and turns as the joint flies home; the right is bumped
+   when the joint lands behind it and nudged when it peeks out; both hop a beat after the mark */
+@keyframes lnj-404-four-l {
+    0%, 21.25% { transform: translateY(0) rotate(0deg); }
+    31%, 57.5% { transform: translateY(0) rotate(5deg); }
+    75% { transform: translateY(0) rotate(-2deg); }
+    80%, 82% { transform: translateY(0) rotate(0deg); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    85.5% { transform: translateY(-40px) rotate(-2deg); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    89%, 100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes lnj-404-four-r {
+    0%, 33.75% { transform: translateY(0) rotate(0deg); }
+    35.5% { transform: translateY(0) rotate(-5deg); }
+    37.5% { transform: translateY(0) rotate(3deg); }
+    39.5% { transform: translateY(0) rotate(-1.5deg); }
+    41.5% { transform: translateY(0) rotate(0deg); }
+    44%, 53% { transform: translateY(0) rotate(4deg); }
+    57.5%, 82% { transform: translateY(0) rotate(0deg); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    85.5% { transform: translateY(-40px) rotate(2deg); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    89%, 100% { transform: translateY(0) rotate(0deg); }
+}
+
+.lnj-404__text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lnj-404__text .lnj-hero__sub {
+    max-width: 32rem;
+}
+
+/* the robot's log line: a mono prompt, the missing address, a blinking cursor */
+.lnj-404__log {
+    margin-top: 1rem !important;
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--fg) 5%, var(--bg));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 7%, transparent);
+    padding: 0.45rem 0.9rem;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    color: var(--mid);
+    font: var(--small) var(--tt), monospace;
+}
+
+.lnj-404__prompt { color: var(--ac); }
+
+#lnj-404 .lnj-404__path {
+    background: none;
+    padding: 0;
+    color: var(--fg);
+    font: inherit;
+}
+
+.lnj-404__cursor {
+    display: inline-block;
+    vertical-align: -0.15em;
+    margin-left: 0.2em;
+    background: var(--ac);
+    width: 0.55em;
+    height: 1.1em;
+    animation: lnj-404-cursor 1s steps(2, jump-none) infinite;
+}
+
+@keyframes lnj-404-cursor { 50% { opacity: 0; } }
+
+.lnj-404__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.lnj-404__note p {
+    color: var(--mid);
+    font-size: var(--small);
+}
+
+.lnj-404__note kbd {
+    border-radius: 0.3em;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 25%, transparent);
+    padding: 0 0.35em;
+    font-family: var(--tt), monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #lnj-404 *,
+    #lnj-404 *::before {
+        animation: none !important;
+    }
+
+    .lnj-404__scan,
+    .lnj-404__shadow {
+        display: none;
+    }
+}

@@ -1,0 +1,122 @@
+{{- /*
+    "About this post": title, author, published / updated, read time, level, stage, license, links and
+    disclaimer, all from the post's front matter:
+      level: beginner | intermediate | advanced    (optional)
+      stage: the taxonomy term, with its animated icon (optional)
+      license: 'MIT'                               (optional)
+      links: [{label, url, icon}]                  (optional; icon: github, youtube, docs, or a brewm icon-font
+                                                    name; guessed from the URL when left out)
+      disclaimer: 'markdown'                       (optional)
+    Called by post/tagged.html as (dict "page" . "variant" "end" | "side"): `end` is the card after the article
+    (every screen), `side` the copy fixed in the left gutter on wide screens, with a × that collapses it into a
+    pill in the same corner (remembered across posts). assets/js/lnj-meta.js hands one over to the other;
+    styles in custom.css ("About this post").
+*/ -}}
+{{- $page := .page }}
+{{- $variant := .variant }}
+{{- $name := $page.Params.byline.name | default site.Params.author.name }}
+{{- $profile := site.GetPage "/about" }}
+{{- with $page.GetTerms "author" }}{{ with index . 0 }}{{ $profile = . }}{{ $name = .Title }}{{ end }}{{ end }}
+{{- $levels := dict "beginner" 1 "intermediate" 2 "advanced" 3 }}
+{{- $level := lower ($page.Params.level | default "") }}
+{{- $svg := `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"` | safeHTMLAttr }}
+<aside class="lnj-meta lnj-meta--{{ $variant }}" id="lnj-meta-{{ $variant }}" aria-labelledby="lnj-meta-title-{{ $variant }}">
+    {{- if eq $variant "side" }}
+        {{- /* collapses the sidebar into the pill below, in the same corner */}}
+        <button class="lnj-meta__close" type="button" aria-label="Collapse About this post" aria-controls="lnj-meta-side">
+            <svg {{ $svg }}><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+    {{- end }}
+    <p class="lnj-meta__kicker" id="lnj-meta-title-{{ $variant }}">About this post</p>
+    <p class="lnj-meta__title">{{ $page.Title }}</p>
+    <a class="lnj-meta__author" {{ with $profile }}href="{{ .RelPermalink }}"{{ end }}>
+        <span class="lnj-meta__by">by</span> <span>{{ $name }}</span>
+    </a>
+
+    <dl class="lnj-meta__facts">
+        <div>
+            <dt>Published</dt>
+            <dd><time datetime="{{ $page.PublishDate.Format "2006-01-02" }}">{{ $page.PublishDate | time.Format ":date_medium" }}</time></dd>
+        </div>
+        {{- if ne ($page.Lastmod.Format "2006-01-02") ($page.PublishDate.Format "2006-01-02") }}
+            <div>
+                <dt>Updated</dt>
+                <dd><time datetime="{{ $page.Lastmod.Format "2006-01-02" }}">{{ $page.Lastmod | time.Format ":date_medium" }}</time></dd>
+            </div>
+        {{- end }}
+        <div>
+            <dt>Read</dt>
+            <dd>{{ $page.ReadingTime }} min</dd>
+        </div>
+        {{- with index $levels $level }}
+            <div>
+                <dt>Level</dt>
+                <dd>
+                    <span class="lnj-level" data-level="{{ . }}" aria-hidden="true"><i></i><i></i><i></i></span>
+                    {{ title $level }}
+                </dd>
+            </div>
+        {{- end }}
+        {{- with $page.GetTerms "stage" }}
+            {{- with index . 0 }}
+                <div>
+                    <dt>Stage</dt>
+                    <dd><a class="lnj-meta__stage" href="{{ .RelPermalink }}"><span class="st {{ lower .Name }}" aria-hidden="true"></span>{{ .Title }}</a></dd>
+                </div>
+            {{- end }}
+        {{- end }}
+        {{- with $page.Params.license }}
+            <div>
+                <dt>License</dt>
+                <dd>{{ . }}</dd>
+            </div>
+        {{- end }}
+    </dl>
+
+    {{- if or $page.Params.links $page.Params.disclaimer }}
+    <div class="lnj-meta__more">
+        {{- with $page.Params.links }}
+            <section class="lnj-meta__group">
+                <p class="lnj-meta__label">Links</p>
+                <ul class="lnj-meta__links">
+                    {{- range . }}
+                        {{- $host := (urls.Parse .url).Host }}
+                        {{- $icon := .icon }}
+                        {{- if not $icon }}
+                            {{- if strings.Contains $host "github.com" }}{{ $icon = "github" }}
+                            {{- else if or (strings.Contains $host "youtube.com") (strings.Contains $host "youtu.be") }}{{ $icon = "youtube" }}
+                            {{- else if eq $host "docs.lnjstudios.com" }}{{ $icon = "docs" }}
+                            {{- end }}
+                        {{- end }}
+                        <li>
+                            <a class="lnj-btn lnj-meta__link" href="{{ .url }}" {{ if $host }}target="_blank" rel="noopener noreferrer"{{ end }}>
+                                {{- if eq $icon "docs" }}
+                                    <span class="lnj-docs__logo" aria-hidden="true"></span>
+                                {{- else if $icon }}
+                                    <i class="icon {{ $icon }}" aria-hidden="true"></i>
+                                {{- end }}
+                                <span class="lnj-meta__link-label">{{ .label }}</span>
+                                <svg class="lnj-meta__out" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                            </a>
+                        </li>
+                    {{- end }}
+                </ul>
+            </section>
+        {{- end }}
+
+        {{- with $page.Params.disclaimer }}
+            <section class="lnj-meta__group">
+                <p class="lnj-meta__label">Disclaimer</p>
+                <div class="lnj-meta__note">{{ . | markdownify }}</div>
+            </section>
+        {{- end }}
+    </div>
+    {{- end }}
+</aside>
+{{- if eq $variant "side" }}
+    {{- /* the collapsed sidebar: a page-tools style pill where the panel's top right corner was */}}
+    <button class="lnj-btn lnj-pill lnj-meta-pill" type="button" aria-expanded="false" aria-controls="lnj-meta-side">
+        <svg {{ $svg }}><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9.5 4v16M13 9h4.5M13 13h4.5"/></svg>
+        <span class="lnj-pill__label">About this post</span>
+    </button>
+{{- end }}

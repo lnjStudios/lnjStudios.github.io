@@ -1,0 +1,34 @@
+{{- /*
+    Contact / social buttons for the résumé and about pages, from a `contact: [{label, url, icon}]` list (icon: a
+    brewm icon-font name: email, linkedin, github, youtube, x, instagram...). The first is the main, filled button.
+    (dict "items" <list> "compact" true): after the first three, icon-only pills (the label goes to aria-label).
+    "print" true adds the Save as PDF button; "page" puts that page's address first in the printed contact line.
+    An item's own `print` text replaces its address in that line (e.g. a phone number for a wa.me link).
+*/ -}}
+{{- $compact := .compact }}
+<div class="lnj-contact">
+    {{- range $i, $c := .items }}
+        {{- $mail := hasPrefix $c.url "mailto:" }}
+        {{- $iconOnly := and $compact (ge $i 3) }}
+        <a class="lnj-btn{{ if eq $i 0 }} lnj-btn--accent{{ end }}{{ if $iconOnly }} lnj-btn--icon{{ end }}" href="{{ $c.url }}"
+            {{- if not $mail }} target="_blank" rel="noopener noreferrer"{{ end }}
+            {{- if $iconOnly }} aria-label="{{ $c.label }}"{{ end }}>
+            {{- with $c.icon }}<i class="icon {{ . }}" aria-hidden="true"></i>{{ end }}
+            {{- if not $iconOnly }}<span>{{ $c.label }}</span>{{ end -}}
+        </a>
+    {{- end }}
+    {{- /* on paper the buttons can't be pressed: a labelled list of the addresses instead, each still a link (a
+           saved PDF keeps them clickable); custom.css shows it only in print */}}
+    <ul class="lnj-contact__print">
+        {{- with .page }}<li><span>Web</span><a href="{{ .Permalink }}">{{ replaceRE "^https?://" "" .Permalink | strings.TrimSuffix "/" }}</a></li>{{ end }}
+        {{- range .items }}
+            <li><span>{{ .label }}</span><a href="{{ .url }}">{{ .print | default (replaceRE "^(mailto:|https?://(www\\.)?)" "" .url) }}</a></li>
+        {{- end }}
+    </ul>
+    {{- with .print }}
+        <button class="lnj-btn lnj-resume__print" type="button" onclick="window.print()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+            <span>Save as PDF</span>
+        </button>
+    {{- end }}
+</div>

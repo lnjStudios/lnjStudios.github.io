@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{{- $lang := or site.Language.Locale site.Language.LanguageCode site.Language.Lang }}
+{{- $dir := or site.Language.Direction site.Language.LanguageDirection "ltr" }}
+<html lang="{{ $lang }}" dir="{{ $dir }}">
+<head>
+    {{ partial "head.html" . }}
+    {{ block "head" . }}{{ end }}
+    {{- /* LnJ: share-preview image alt text, which brewm's head/meta.html doesn't print */}}
+    {{ partial "head/image-alt.html" . }}
+    {{- if eq (lower site.Params.analytics.append) "head" -}}
+        {{ partialCached "analytics.html" . }}
+    {{- end }}
+</head>
+{{- if not (or .Params.headless .Params.target .Params.alias) }}
+<body>
+    {{ partial "header.html" . }}
+    {{ block "aside" . }}{{ end }}
+    {{ "<!-- [main] baseof.html -->" | safeHTML }}
+    <main id="{{ .Kind }}" {{- if eq .Kind "page" }}class="{{- with .Params.type -}}{{ . }}{{ else }}page{{ end }}"
+        {{ end -}}>
+        {{ partial "main/header.html" . }}
+        <div id="top">
+            {{ block "top" . }}{{ end }}
+        </div>
+        {{ block "main" . }}{{ end }}
+        <div id="exclude">
+            {{ "<!-- excluded last block frome some RSS reader and browser reader mode -->" | safeHTML }}
+            {{ block "exclude" . }}{{ end }}
+        {{ partialCached "main/footer.html" . }}
+        </div>
+    </main>
+    {{ partialCached "footer.html" . }}
+    {{- /* LnJ: the right-hand rail is per page (share URL, QR),
+       so it can't live in the cached analytics.html. After the footer: brewm's CSS relies on
+       `main#page + footer` (BionRead, baseline stretch). */}}
+    {{ partial "rail.html" . }}
+    {{ block "post" . }}{{ end }}
+    {{ "<!-- [background] baseof.html -->" | safeHTML }}
+    <div id="background-body" role="presentation" aria-hidden="true"></div>
+    {{- if eq (lower site.Params.analytics.append) "body" -}}
+        {{ partialCached "analytics.html" . }}
+    {{- end }}
+</body>
+{{- end }}
+</html>

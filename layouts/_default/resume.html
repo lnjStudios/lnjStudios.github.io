@@ -1,0 +1,183 @@
+{{- /*
+    Résumé / portfolio page (content/koustav/index.md, `layout: resume`), all from its front matter, in the order a
+    hiring manager reads: hero (photo, role, name, one-line profile, contact buttons), primary skills (`core`, big
+    chips), the profile (the page's own text), then experience (a timeline: one long link with a joint per job;
+    `note` + `points`), projects, side projects (`side`: a `page` on this site, or title / url / text), the
+    author's posts (it's a term of the `author` taxonomy: content/author/<id>/_index.md), and beside them skills,
+    education and achievements. Ends with the contact buttons again. Empty lists drop their section.
+    Prints as a clean CV ("Save as PDF"). Styles in custom.css ("About / résumé pages").
+*/ -}}
+{{- define "main" }}
+{{- $svg := `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"` | safeHTMLAttr }}
+{{- $arrow := `<path d="M5 12h14M13 6l6 6-6 6"/>` }}
+<article id="lnj-resume" class="lnj-page pagewidth">
+    <header class="lnj-hero lnj-hero--person">
+        {{- with .Resources.Get .Params.photo }}
+            <div class="lnj-person__photo lnj-person__photo--hero">
+                <img src="{{ (.Resize "640x webp q85").RelPermalink }}" alt="{{ $.Title }}" width="320" height="320">
+            </div>
+        {{- end }}
+        <div class="lnj-hero__text">
+            {{- with .Params.role }}<p class="lnj-kicker">{{ . }}</p>{{ end }}
+            <h1 class="lnj-hero__title" id="title">{{ .Title }}</h1>
+            {{- with .Params.tagline }}<p class="lnj-hero__sub">{{ . }}</p>{{ end }}
+            {{ partial "contact-buttons.html" (dict "items" .Params.contact "print" true "page" .) }}
+        </div>
+    </header>
+
+    {{- with .Params.core }}
+        <section class="lnj-core" aria-labelledby="lnj-core">
+            <h2 class="lnj-skill__group" id="lnj-core">Primary skills</h2>
+            <ul class="lnj-chips lnj-chips--core">
+                {{- range . }}<li>{{ . }}</li>{{ end }}
+            </ul>
+        </section>
+    {{- end }}
+
+    <div class="lnj-resume__grid">
+        <div class="lnj-resume__main">
+            {{- with .Content }}
+                <section class="lnj-page__section lnj-resume__profile" aria-labelledby="lnj-profile">
+                    <h2 class="lnj-section-title" id="lnj-profile">Profile</h2>
+                    {{ . }}
+                </section>
+            {{- end }}
+
+            {{- with .Params.experience }}
+                <section class="lnj-page__section" aria-labelledby="lnj-exp">
+                    <h2 class="lnj-section-title" id="lnj-exp">Experience</h2>
+                    <ol class="lnj-timeline">
+                        {{- range . }}
+                            <li class="lnj-timeline__item">
+                                <p class="lnj-timeline__when">{{ .from }}{{ with .to }} – {{ . }}{{ end }}</p>
+                                <p class="lnj-timeline__role">{{ .role }}</p>
+                                <p class="lnj-timeline__org">
+                                    {{- if .url }}
+                                        <a href="{{ .url }}" {{ if hasPrefix .url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>{{ .org }}</a>
+                                    {{- else }}{{ .org }}{{ end -}}
+                                </p>
+                                {{- with .note }}<p class="lnj-timeline__note">{{ . }}</p>{{ end }}
+                                {{- with .points }}
+                                    <ul class="lnj-timeline__points">
+                                        {{- range . }}<li>{{ . | markdownify }}</li>{{ end }}
+                                    </ul>
+                                {{- end }}
+                                {{- with .text }}<p class="lnj-timeline__text">{{ . | markdownify }}</p>{{ end }}
+                                {{- with .tools }}
+                                    <ul class="lnj-chips" aria-label="Worked with">
+                                        {{- range . }}<li>{{ . }}</li>{{ end }}
+                                    </ul>
+                                {{- end }}
+                            </li>
+                        {{- end }}
+                    </ol>
+                </section>
+            {{- end }}
+
+            {{- with .Params.projects }}
+                <section class="lnj-page__section" aria-labelledby="lnj-proj">
+                    <h2 class="lnj-section-title" id="lnj-proj">Projects</h2>
+                    <div class="lnj-cards lnj-cards--two">
+                        {{- range . }}
+                            {{- if .url }}
+                                <a class="lnj-card" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
+                                    <span class="lnj-card__title">{{ .title }}</span>
+                                    <span class="lnj-card__text">{{ .text }}</span>
+                                    <svg class="lnj-card__go" {{ $svg }}>{{ $arrow | safeHTML }}</svg>
+                                </a>
+                            {{- else }}
+                                <div class="lnj-card lnj-card--static">
+                                    <span class="lnj-card__title">{{ .title }}</span>
+                                    <span class="lnj-card__text">{{ .text }}</span>
+                                </div>
+                            {{- end }}
+                        {{- end }}
+                    </div>
+                </section>
+            {{- end }}
+
+            {{- with .Params.side }}
+                <section class="lnj-page__section" aria-labelledby="lnj-side">
+                    <h2 class="lnj-section-title" id="lnj-side">Side projects</h2>
+                    <div class="lnj-cards lnj-cards--list">
+                        {{- range . }}
+                            {{- $p := false }}
+                            {{- with .page }}{{ $p = site.GetPage . }}{{ end }}
+                            {{- $url := .url }}{{ $title := .title }}{{ $text := .text }}
+                            {{- with $p }}{{ $url = .RelPermalink }}{{ $title = .LinkTitle }}{{ $text = .Description }}{{ end }}
+                            <a class="lnj-card" href="{{ $url }}" {{ if hasPrefix $url "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
+                                <span class="lnj-card__title">
+                                    {{- with $p }}{{ with .GetTerms "stage" }}{{ with index . 0 }}<span class="st {{ lower .Name }}" aria-hidden="true"></span>{{ end }}{{ end }}{{ end -}}
+                                    {{ $title }}
+                                </span>
+                                <span class="lnj-card__text">{{ $text }}</span>
+                                <svg class="lnj-card__go" {{ $svg }}>{{ $arrow | safeHTML }}</svg>
+                            </a>
+                        {{- end }}
+                    </div>
+                </section>
+            {{- end }}
+
+            {{- /* an author page lists the author's posts (it's a term of the `author` taxonomy) */}}
+            {{- with .Pages }}
+                <section class="lnj-page__section" aria-labelledby="lnj-writing">
+                    <h2 class="lnj-section-title" id="lnj-writing">Writing</h2>
+                    <ul class="lnj-writing">
+                        {{- range .ByDate.Reverse }}
+                            <li>
+                                <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+                                <span>{{ with .GetTerms "categories" }}{{ (index . 0).LinkTitle }} · {{ end }}{{ .PublishDate | time.Format ":date_medium" }}</span>
+                            </li>
+                        {{- end }}
+                    </ul>
+                </section>
+            {{- end }}
+        </div>
+
+        <aside class="lnj-resume__side">
+            {{- with .Params.skills }}
+                <section class="lnj-page__section" aria-labelledby="lnj-skills">
+                    <h2 class="lnj-section-title" id="lnj-skills">Skills</h2>
+                    {{- range . }}
+                        <div class="lnj-skill">
+                            <p class="lnj-skill__group">{{ .group }}</p>
+                            <ul class="lnj-chips">
+                                {{- range .items }}<li>{{ . }}</li>{{ end }}
+                            </ul>
+                        </div>
+                    {{- end }}
+                </section>
+            {{- end }}
+
+            {{- with .Params.education }}
+                <section class="lnj-page__section" aria-labelledby="lnj-edu">
+                    <h2 class="lnj-section-title" id="lnj-edu">Education</h2>
+                    {{- range . }}
+                        <div class="lnj-skill">
+                            <p class="lnj-timeline__role">{{ .degree }}</p>
+                            <p class="lnj-timeline__org">{{ .org }}</p>
+                            <p class="lnj-timeline__when">{{ .from }}{{ with .to }} – {{ . }}{{ end }}{{ with .note }} · {{ . }}{{ end }}</p>
+                        </div>
+                    {{- end }}
+                </section>
+            {{- end }}
+
+            {{- with .Params.achievements }}
+                <section class="lnj-page__section" aria-labelledby="lnj-ach">
+                    <h2 class="lnj-section-title" id="lnj-ach">Achievements</h2>
+                    <ul class="lnj-resume__list">
+                        {{- range . }}<li>{{ . | markdownify }}</li>{{ end }}
+                    </ul>
+                </section>
+            {{- end }}
+        </aside>
+    </div>
+
+    {{- with .Params.contact }}
+        <section class="lnj-page__section lnj-resume__end" aria-labelledby="lnj-touch">
+            <h2 class="lnj-section-title" id="lnj-touch">Get in touch</h2>
+            {{ partial "contact-buttons.html" (dict "items" .) }}
+        </section>
+    {{- end }}
+</article>
+{{- end }}

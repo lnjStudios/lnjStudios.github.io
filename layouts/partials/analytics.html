@@ -1,0 +1,38 @@
+{{- /*
+    brewm's end-of-body hook (params.analytics.append = 'body'). No analytics here: it carries
+    - the site search pill, reading the index Hugo renders from assets/json/search-index.json,
+      moved into brewm's bottom row (#body-footer) right after the gear
+      (the right-hand rail is per page, so it's in rail.html, called from our baseof.html)
+    - the Settings panel's bottom row (About + RSS), swapped in for brewm's Save / Reset / Close
+*/ -}}
+{{- $index := resources.Get "json/search-index.json" | resources.ExecuteAsTemplate "search-index.json" site.Home | minify | fingerprint }}
+<div class="lnj-search" role="search" data-index="{{ $index.RelPermalink }}">
+    <ul class="lnj-search__results" id="lnj-search-results" role="listbox" aria-label="Search results" hidden></ul>
+    <input class="lnj-search__input" id="lnj-search-input" type="search" placeholder="Search"
+        aria-label="Search notes and tools" aria-controls="lnj-search-results" aria-expanded="false"
+        autocomplete="off" spellcheck="false">
+    <kbd class="lnj-kbd" aria-hidden="true">/</kbd>
+</div>
+
+<script>document.querySelector('#body-footer > #has-a11y')?.after(document.currentScript.previousElementSibling);</script>
+
+<template id="lnj-a11y-menu">
+    {{- with site.GetPage "/about" }}
+        <a class="lnj-btn lnj-btn--wide lnj-btn--accent" href="{{ .RelPermalink }}">About us</a>
+    {{- end }}
+    {{- with site.Home.OutputFormats.Get "rss" }}
+        <a class="lnj-btn lnj-btn--icon lnj-rss" href="{{ .RelPermalink }}" aria-label="RSS feed" title="RSS feed">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle class="lnj-rss__dot" cx="5" cy="19" r="2"/>
+                <path class="lnj-rss__arc lnj-rss__arc--1" d="M4 11a9 9 0 0 1 9 9"/>
+                <path class="lnj-rss__arc lnj-rss__arc--2" d="M4 4a16 16 0 0 1 16 16"/>
+            </svg>
+        </a>
+    {{- end }}
+</template>
+
+{{- range slice "js/lnj-settings.js" "js/lnj-search.js" "js/lnj-rail.js" "js/lnj-tools.js" "js/lnj-code.js" "js/lnj-meta.js" "js/lnj-amr.js" }}
+    {{- with resources.Get . | minify | fingerprint }}
+        <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" defer></script>
+    {{- end }}
+{{- end }}

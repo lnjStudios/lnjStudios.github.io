@@ -1,0 +1,74 @@
+{{- /*
+    Overrides brewm's inline page/timestamp.html (themes/hugo-brewm/layouts/partials/bundles/leaf.html), which
+    single.html prints under the title. Article byline, like the docs site: avatar + author | date (last edited
+    if it was, else published), then the tags as small accent buttons, the post image, and the description as a
+    grey intro line. custom.css reorders the header: byline, title, tags, image, intro. brewm's own author line (#doc-author) is
+    hidden in custom.css, and its tag list at the end of the article (post/tagged.html) is emptied.
+*/ -}}
+{{- /* Author: the post's author page (`author: [id]`), else its `byline: {name, avatar}` front matter, else
+       params.author in hugo.toml. Not brewm's
+       `author` key: brewm prints that as a plain name (cards, RSS, meta), so it can't hold a map.
+       avatar is a link (fetched + resized at build time, so visitors don't load it from elsewhere; the link
+       itself if the fetch fails), or a site path: an image under assets/ (resized) or static/ (as is). */}}
+{{- $name := .Params.byline.name | default site.Params.author.name }}
+{{- $avatar := .Params.byline.avatar | default site.Params.author.avatar }}
+{{- /* an author page (`author: [id]` → content/author/<id>/) wins: its title, its `avatar`, and the name links
+       to it instead of About */}}
+{{- $profile := site.GetPage "/about" }}
+{{- with .GetTerms "author" }}
+    {{- with index . 0 }}
+        {{- $profile = . }}
+        {{- $name = .Title }}
+        {{- with .Params.avatar }}{{ $avatar = . }}{{ end }}
+    {{- end }}
+{{- end }}
+{{- $avatarSrc := "" }}
+{{- with $avatar }}
+    {{- $avatarSrc = . }}
+    {{- $img := "" }}
+    {{- if hasPrefix . "http" }}
+        {{- with try (resources.GetRemote .) }}{{ $img = .Value }}{{ end }}
+    {{- else }}
+        {{- $img = resources.Get (strings.TrimPrefix "/" .) }}
+        {{- if not $img }}{{ $avatarSrc = relURL (strings.TrimPrefix "/" .) }}{{ end }}
+    {{- end }}
+    {{- with $img }}
+        {{- if eq .MediaType.SubType "svg" }}
+            {{- $avatarSrc = .RelPermalink }}
+        {{- else }}
+            {{- $avatarSrc = (.Resize "64x64 webp q85").RelPermalink }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+<div class="lnj-byline">
+    <a class="lnj-byline__author" {{ with $profile }}href="{{ .RelPermalink }}"{{ end }}>
+        {{- with $avatarSrc }}
+            <img src="{{ . }}" width="32" height="32" alt="" loading="lazy">
+        {{- end }}
+        <span>{{ $name }}</span>
+    </a>
+    {{- if ne (.Lastmod.Format "2006-01-02") (.PublishDate.Format "2006-01-02") }}
+        <span class="lnj-byline__date">Updated <time datetime="{{ .Lastmod.Format "2006-01-02" }}">{{ .Lastmod | time.Format ":date_long" }}</time></span>
+    {{- else }}
+        <span class="lnj-byline__date"><time datetime="{{ .PublishDate.Format "2006-01-02" }}">{{ .PublishDate | time.Format ":date_long" }}</time></span>
+    {{- end }}
+</div>
+{{- with .GetTerms "tags" }}
+    <nav class="lnj-tags" aria-label="Tags">
+        {{- range . }}
+            <a class="lnj-btn lnj-tag" href="{{ .RelPermalink }}">#{{ .Data.Term }}</a>
+        {{- end }}
+    </nav>
+{{- end }}
+{{- /* the post image: `banner` (a wide one made for the page), else `cover` (the card image); a page resource
+       or a site path. Alt text from `alt` */}}
+{{- with .Params.banner | default .Params.cover }}
+    {{- $src := . }}
+    {{- with $.Resources.Get . }}{{ $src = .RelPermalink }}{{ end }}
+    <figure class="lnj-banner">
+        <img src="{{ $src }}" alt="{{ $.Params.alt | default $.Title }}">
+    </figure>
+{{- end }}
+{{- with .Description }}
+    <p class="lnj-lede">{{ . }}</p>
+{{- end }}

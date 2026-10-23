@@ -1,0 +1,7 @@
+{{- /*
+    Overrides brewm's inline post/tagged.html, which single.html calls right after a post's body. brewm's tag
+    list isn't repeated here (the tags are under the title, by our page/timestamp.html); instead: "About this
+    post" (partials/about-post.html), as the card that ends the article and, on wide screens, the sidebar copy.
+*/ -}}
+{{ partial "about-post.html" (dict "page" . "variant" "end") }}
+{{ partial "about-post.html" (dict "page" . "variant" "side") }}

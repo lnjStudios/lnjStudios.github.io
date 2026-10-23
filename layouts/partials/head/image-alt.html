@@ -1,0 +1,13 @@
+{{- /*
+    Alt text for the share-preview image (og:image / twitter:image), which brewm's head/meta.html prints
+    without one. Same choice of image as brewm: the post's cover (alt from its `alt` front matter),
+    else the site card (params.socialCard.imagesAlt).
+*/ -}}
+{{- $alt := site.Params.socialCard.imagesAlt }}
+{{- if and (not .IsHome) (or .Params.cover .Params.image) .Params.alt }}
+    {{- $alt = .Params.alt }}
+{{- end }}
+{{- with $alt }}
+    <meta property="og:image:alt" content="{{ . }}">
+    <meta name="twitter:image:alt" content="{{ . }}">
+{{- end }}

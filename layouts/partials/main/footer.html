@@ -1,0 +1,39 @@
+{{- /*
+    LnJ footer card (replaces brewm's main/footer.html, which makes a column per `type: footer` page and so
+    split ours in two). One card at the end of every page, from content/essentials/footer.md: the logo and the
+    page's text on the left, its `links` as pills on the right; under a rule, params.copyright and the
+    menus.footer social icons (hugo.toml). Called with partialCached: nothing page-specific in here.
+    Styles: custom.css "Footer".
+*/ -}}
+{{ "<!-- main/footer.html (lnj) -->" | safeHTML }}
+{{- with site.GetPage "/essentials/footer" }}
+<footer id="main-footer" class="lnj-footer">
+    <div class="lnj-footer__top">
+        <div class="lnj-footer__about">
+            <a class="lnj-footer__logo" href="{{ "/" | relLangURL }}" aria-label="{{ .Title }}, home"></a>
+            <div class="lnj-footer__text">{{ .Content }}</div>
+        </div>
+        {{- with .Params.links }}
+            <nav class="lnj-footer__links" aria-label="Elsewhere">
+                {{- range . }}
+                    {{- $external := strings.HasPrefix .url "http" }}
+                    <a class="lnj-btn" href="{{ if $external }}{{ .url }}{{ else }}{{ .url | relLangURL }}{{ end }}"
+                        {{- if $external }} target="_blank" rel="noopener"{{ end }}>{{ .label }}</a>
+                {{- end }}
+            </nav>
+        {{- end }}
+    </div>
+    <div class="lnj-footer__bottom">
+        {{- with site.Params.copyright }}<p class="lnj-footer__legal">{{ . }}</p>{{ end }}
+        {{- with site.Menus.footer }}
+            <nav class="lnj-footer__social" aria-label="Follow along">
+                {{- range . }}
+                    <a class="lnj-btn lnj-btn--icon" href="{{ .URL }}" target="_blank" rel="noopener" aria-label="{{ .Name }}">
+                        <i class="icon {{ .Pre }}" aria-hidden="true"></i>
+                    </a>
+                {{- end }}
+            </nav>
+        {{- end }}
+    </div>
+</footer>
+{{- end }}

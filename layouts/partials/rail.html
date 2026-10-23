@@ -1,0 +1,103 @@
+{{- /*
+    Right-hand rail, bottom right, stacked vertically (like the slide dots). Called from our baseof.html,
+    per page. Top to bottom:
+      back-to-top (shown only once the page is scrolled, assets/js/lnj-rail.js)
+      home page:   Links & Docs
+      other pages: Categories, Share (not on the 404 page), Home
+    Posts (type: post) also get the page tools (Contents / Reading mode / Print, top right): page-tools.html.
+    Other pages get none: their Reading mode is in Settings.
+    Icon-only pills; the label slides out to the left on hover. Categories / Share are drawers: clicking
+    pushes the buttons above up and slides the contents (more floating pills) open right under the button,
+    while its icon spins into an ×. Behaviour in assets/js/lnj-rail.js, styles in assets/css/custom.css.
+*/ -}}
+{{- $svg := `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"` | safeHTMLAttr }}
+{{- $close := `<svg class="lnj-pop__close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>` | safeHTML }}
+{{- if and .IsPage (eq .Type "post") }}
+    {{ partial "page-tools.html" . }}
+{{- end }}
+<div class="lnj-rail">
+    <a class="lnj-btn lnj-pill lnj-totop" href="#top">
+        <svg {{ $svg }}><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        <span class="lnj-pill__label">Back to top</span>
+    </a>
+
+    {{- if .IsHome }}
+        <a class="lnj-btn lnj-pill lnj-docs" href="https://docs.lnjstudios.com/">
+            <span class="lnj-docs__logo" aria-hidden="true"></span>
+            <span class="lnj-pill__label">Links &amp; Docs</span>
+        </a>
+    {{- else }}
+        {{- with site.Taxonomies.categories }}
+            <div class="lnj-pop lnj-cats">
+                <button class="lnj-btn lnj-pill lnj-pop__toggle" type="button" aria-expanded="false" aria-controls="lnj-cats">
+                    <span class="lnj-pop__icon">
+                        <svg class="lnj-pop__glyph" {{ $svg }}>
+                            <rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/>
+                            <rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>
+                        </svg>
+                        {{ $close }}
+                    </span>
+                    <span class="lnj-pill__label">Categories</span>
+                </button>
+                <div class="lnj-drawer" id="lnj-cats" inert>
+                    <nav class="lnj-drawer__inner" aria-label="Categories">
+                        {{- range .Alphabetical }}
+                            <a class="lnj-btn" href="{{ .Page.RelPermalink }}">
+                                {{ .Page.LinkTitle }}<span class="lnj-cats__count">{{ .Count }}</span>
+                            </a>
+                        {{- end }}
+                    </nav>
+                </div>
+            </div>
+        {{- end }}
+
+        {{- /* nothing to share on the "page not found" page */}}
+        {{- if ne .Kind "404" }}
+        {{- /* What gets shared: the platforms get the text itself (title, description, link), so the post
+               isn't empty even when they can't fetch the page's preview (always the case on localhost) */}}
+        {{- $title := .Title | plainify }}
+        {{- $desc := .Description | default .Summary | plainify | truncate 160 }}
+        {{- $text := printf "%s\n\n%s\n\n%s" $title $desc .Permalink }}
+        {{- $qr := images.QR .Permalink (dict "scale" 6 "targetDir" "images/qr") }}
+        <div class="lnj-pop lnj-share">
+            <button class="lnj-btn lnj-pill lnj-pop__toggle" type="button" aria-expanded="false" aria-controls="lnj-share">
+                <span class="lnj-pop__icon">
+                    <svg class="lnj-pop__glyph" {{ $svg }}>
+                        <circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/>
+                        <path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>
+                    </svg>
+                    {{ $close }}
+                </span>
+                <span class="lnj-pill__label">Share</span>
+            </button>
+            <div class="lnj-drawer" id="lnj-share" inert>
+                <div class="lnj-drawer__inner" role="group" aria-label="Share this page">
+                    <img class="lnj-share__qr" src="{{ $qr.RelPermalink }}" width="{{ $qr.Width }}" height="{{ $qr.Height }}"
+                        alt="QR code linking to {{ $title }}" loading="lazy">
+                    <div class="lnj-share__icons">
+                        <a class="lnj-btn lnj-btn--icon" href="https://www.linkedin.com/feed/?shareActive=true&text={{ $text | urlquery }}"
+                            target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn"><i class="icon linkedin" aria-hidden="true"></i></a>
+                        <a class="lnj-btn lnj-btn--icon" href="https://x.com/intent/tweet?text={{ printf "%s\n\n%s" $title $desc | urlquery }}&url={{ .Permalink | urlquery }}"
+                            target="_blank" rel="noopener noreferrer" aria-label="Share on X"><i class="icon x" aria-hidden="true"></i></a>
+                        <a class="lnj-btn lnj-btn--icon" href="https://www.reddit.com/submit?type=LINK&url={{ .Permalink | urlquery }}&title={{ $title | urlquery }}"
+                            target="_blank" rel="noopener noreferrer" aria-label="Share on Reddit"><i class="icon reddit" aria-hidden="true"></i></a>
+                        <a class="lnj-btn lnj-btn--icon" href="https://wa.me/?text={{ $text | urlquery }}"
+                            target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp"><i class="icon whatsapp" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="lnj-share__copy">
+                        <button class="lnj-btn" type="button" data-copy="link" data-url="{{ .Permalink }}">Copy link</button>
+                        <button class="lnj-btn" type="button" data-copy="qr">Copy QR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{- end }}
+
+        <a class="lnj-btn lnj-pill" href="{{ "/" | relLangURL }}">
+            <svg {{ $svg }}>
+                <path d="M3 10.2 12 3l9 7.2V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9.5 21v-6.5h5V21"/>
+            </svg>
+            <span class="lnj-pill__label">Home</span>
+        </a>
+    {{- end }}
+</div>

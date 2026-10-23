@@ -1,0 +1,17 @@
+{{- /*
+    Site search index, rendered by Hugo at build time (resources.ExecuteAsTemplate in
+    layouts/partials/analytics.html), the same way Hextra builds its search-data.json.
+    Only posts (tools + notes). assets/js/lnj-search.js fetches it and does the matching.
+*/ -}}
+{{- $out := slice -}}
+{{- range where site.RegularPages "Type" "post" -}}
+    {{- $out = $out | append (dict
+        "title" .Title
+        "url" .RelPermalink
+        "description" (.Description | default "")
+        "tags" (delimit (.Params.tags | default slice) " ")
+        "category" (delimit (.Params.categories | default slice) " ")
+        "content" (.Plain | htmlUnescape | replaceRE `\s+` " ")
+    ) -}}
+{{- end -}}
+{{- $out | jsonify -}}

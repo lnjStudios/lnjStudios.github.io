@@ -1,0 +1,126 @@
+{{- /*
+    "Page not found" (published as /404.html; GitHub Pages serves it for any missing address). Replaces brewm's,
+    which fades a bare "404" out and sends you home after 15 s. Text from content/essentials/404.md.
+    The art is "4 0 4" with the LnJ mark as the 0, its two pieces read from the logo file (the first two paths
+    in static/images/brand/lnj-studios-ink.svg). One endless 8 s loop: the joint (the accent J) works loose,
+    leaps out, lands behind the right 4, peeks out looking for the page, ducks back, leaps home with a click, and
+    the mark hops, the 4s a beat after it. While the joint is away the lidar sweeps (4 turns a loop) and its
+    shadow follows it on the floor; the link and the 4s turn to watch.
+    CSS only (custom.css "404 page"); still with reduced motion. The JS line only fills in the missing address.
+*/ -}}
+{{- define "main" }}
+{{- $text := site.GetPage "/essentials/404" }}
+{{- $logo := readFile "static/images/brand/lnj-studios-ink.svg" }}
+{{- $mark := findRESubmatch `<path d="([^"]+)"` $logo 2 }}
+{{- $link := index (index $mark 0) 1 }}
+{{- $joint := index (index $mark 1) 1 }}
+<article id="lnj-404" class="lnj-page pagewidth">
+    {{- /* scene units are the logo's: the mark spans x 174–884, y 185–897 (centre 529 541); the joint's own
+           centre is 610 653, the link's 481 492. The floor is the mark's bottom, y 897. */}}
+    <svg class="lnj-404__art" viewBox="-640 -60 2340 1060" role="img" aria-label="404, with the LnJ logo as the zero">
+        <g class="lnj-404__radar" aria-hidden="true">
+            <circle cx="529" cy="541" r="380"/>
+            <circle cx="529" cy="541" r="600"/>
+            {{- /* the scan only shows while the joint is away */}}
+            <g class="lnj-404__scan">
+                <g transform="translate(529 541)">
+                    <g class="lnj-404__sweep">
+                        <path d="M0 0H600A600 600 0 0 0 587 -125Z" opacity="0.2"/>
+                        <path d="M0 0H600A600 600 0 0 0 548 -244Z" opacity="0.12"/>
+                        <path d="M0 0H600A600 600 0 0 0 485 -353Z" opacity="0.07"/>
+                        <path d="M0 0H600A600 600 0 0 0 386 -460Z" opacity="0.035"/>
+                    </g>
+                </g>
+                {{- /* blips light up as the sweep passes them: delay = angle (clockwise from +x) / 360 * 2 s */}}
+                <g class="lnj-404__blips">
+                    <circle cx="1023" cy="804" r="16" style="animation-delay: 0.16s"/>
+                    <circle cx="330" cy="967" r="16" style="animation-delay: 0.64s"/>
+                    <circle cx="172" cy="671" r="16" style="animation-delay: 0.89s"/>
+                    <circle cx="-7" cy="346" r="16" style="animation-delay: 1.11s"/>
+                    <circle cx="375" cy="118" r="16" style="animation-delay: 1.39s"/>
+                    <circle cx="923" cy="186" r="16" style="animation-delay: 1.77s"/>
+                </g>
+            </g>
+        </g>
+        <path class="lnj-404__floor" d="M-560 930H1620" aria-hidden="true"/>
+
+        {{- /* the joint's shadow: follows it along the floor (same x animation), shrinks as it rises */}}
+        <g transform="translate(610 910)" aria-hidden="true">
+            <g class="lnj-404__jx">
+                <ellipse class="lnj-404__shadow" rx="240" ry="22"/>
+            </g>
+        </g>
+
+        <g transform="translate(-200 897)"><text class="lnj-404__four lnj-404__four--l" text-anchor="middle" aria-hidden="true">4</text></g>
+
+        {{- /* every moving part sits in a group translated to its pivot, so its animation turns about 0 0.
+               The joint is layered so each motion has its own timing: x (steady in flight), y (gravity: easing
+               out on the way up, in on the way down), squash about its feet (244 below its centre), spin */}}
+        <g transform="translate(529 897)">
+            <g class="lnj-404__mark">
+                <g transform="translate(-48 -405)">
+                    <g class="lnj-404__link">
+                        <path transform="translate(-481 -492) rotate(-45 540 540)" d="{{ $link }}"/>
+                    </g>
+                </g>
+                <g transform="translate(81 -244)">
+                    <g class="lnj-404__jx">
+                        <g class="lnj-404__jy">
+                            <g transform="translate(0 244)">
+                                <g class="lnj-404__js">
+                                    <g transform="translate(0 -244)">
+                                        <g class="lnj-404__jr">
+                                            <path class="lnj-404__joint" transform="translate(-610 -653) rotate(-45 540 540)" d="{{ $joint }}"/>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+                <g transform="translate(40 -250)" aria-hidden="true">
+                    <circle class="lnj-404__click" r="70"/>
+                </g>
+            </g>
+        </g>
+
+        {{- /* drawn after the mark, so the joint hides behind it */}}
+        <g transform="translate(1258 897)"><text class="lnj-404__four lnj-404__four--r" text-anchor="middle" aria-hidden="true">4</text></g>
+    </svg>
+
+    <header class="lnj-404__text">
+        {{- with $text }}
+            {{- with .Params.kicker }}<p class="lnj-kicker">{{ . }}</p>{{ end }}
+            <h1 class="lnj-hero__title" id="title">{{ .Params.headline | default .Title }}</h1>
+            {{- with .Params.subtitle }}<p class="lnj-hero__sub">{{ . }}</p>{{ end }}
+            {{- with .Params.log }}
+                <p class="lnj-404__log"><span class="lnj-404__prompt" aria-hidden="true">&gt;</span> {{ . }}
+                    <code class="lnj-404__path">this page</code><span class="lnj-404__cursor" aria-hidden="true"></span></p>
+                <script>
+                    (() => {
+                        let path = location.pathname;
+                        try { path = decodeURI(path); } catch (e) { /* malformed %-escapes: show it as typed */ }
+                        document.currentScript.previousElementSibling.querySelector('.lnj-404__path').textContent = path;
+                    })();
+                </script>
+            {{- end }}
+        {{- else }}
+            <h1 class="lnj-hero__title" id="title">{{ i18n "404PageNotFound" }}</h1>
+        {{- end }}
+    </header>
+
+    {{- with $text }}
+        {{- with .Params.buttons }}
+            <nav class="lnj-404__actions" aria-label="Where to next">
+                {{- range $i, $b := . }}
+                    {{- $external := strings.HasPrefix .url "http" }}
+                    <a class="lnj-btn{{ if eq $i 0 }} lnj-btn--accent{{ end }}"
+                        href="{{ if $external }}{{ .url }}{{ else }}{{ .url | relLangURL }}{{ end }}"
+                        {{- if $external }} target="_blank" rel="noopener"{{ end }}>{{ .label }}</a>
+                {{- end }}
+            </nav>
+        {{- end }}
+        {{- with .Content }}<div class="lnj-404__note">{{ . }}</div>{{ end }}
+    {{- end }}
+</article>
+{{- end }}

@@ -1,0 +1,21 @@
+# Development overrides, merged over ../../hugo.toml.
+# Used by `hugo server` (and `hugo -e development`); production builds ignore this file.
+
+baseURL = 'http://localhost:1313/'
+
+# Preview drafts and future-dated posts locally; production never publishes them
+buildDrafts = true
+buildFuture = true
+
+# Skip reading git history on every rebuild (lastmod falls back to front matter / date)
+enableGitInfo = false
+
+# Keep crawlers and social cards out of the local build
+enableRobotsTXT = false
+
+[params]
+	extMeta = false
+
+	[params.socialCard]
+		enable = false
+

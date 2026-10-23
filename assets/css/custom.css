@@ -95,18 +95,18 @@ html body > header #logo * {
         object-fit: cover;
     }
 
-    /* greeter text spans the photo's height: heading at its top edge, last line at its bottom edge */
+    /* greeter text: heading and paragraphs kept together, the block centred on the trailer's height */
     html #home .hero__image + .hero__content {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-self: stretch;
         padding: 0;
         font-size: var(--normalsize);
     }
 
     html #home .hero__content h1 {
-        margin-top: -0.2em;
-        margin-bottom: auto;
+        margin: 0 0 0.6em;
         font-size: var(--Large);
     }
 
@@ -3741,4 +3741,597 @@ html body #main-footer .lnj-footer__legal {
     .lnj-404__shadow {
         display: none;
     }
+}
+
+/* ------------------------------------------------------------------
+   Home trailer (layouts/partials/home-trailer.html, the hero on home): a 30 s "channel trailer". Chapters
+   start at 0 / 4.75 / 9.5 / 14.25 / 19 s and are 4.75 s long (15.83 % of the loop); the end card starts at
+   23.75 s and runs 6.25 s. Every `.an` runs the 30 s loop delayed by its chapter's start (`--d`) plus its own
+   offset (`--o`), so its keyframes are in chapter time: 1 % = 0.3 s, a chapter is 0-15.83 %. Parts with an
+   offset go back to their start 20 s into their own loop (66.67 %), while their chapter is off screen, so they
+   never flash at rest when the chapter comes round again. Base styles (no animation) are the end card, which is what reduced motion shows.
+   Colours: the theme's (--fg / --bg / --ac / --mid) only, so it follows light / dark / colour-blind modes.
+   ------------------------------------------------------------------ */
+html #home .hero__image.lnj-trailer {
+    height: auto;
+    --lnj-tr-loop: 30s;
+    --lnj-tr-bg: color-mix(in srgb, var(--fg) 4%, var(--bg));
+    position: relative;
+    display: block;
+    border-radius: 1ex;
+    background: var(--lnj-tr-bg);
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+}
+
+.lnj-trailer__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.lnj-trailer .an {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: var(--lnj-tr-loop) cubic-bezier(0.37, 0, 0.63, 1) infinite both; /* ease in-out sine */
+    animation-delay: calc(var(--d, 0s) + var(--o, 0s));
+}
+
+.lnj-trailer.is-paused *,
+.lnj-trailer.is-paused *::before {
+    animation-play-state: paused !important;
+}
+
+/* frame, text */
+.lnj-tr__bg { fill: var(--lnj-tr-bg); }
+.lnj-tr__dot-grid { fill: color-mix(in srgb, var(--fg) 9%, transparent); }
+.lnj-tr__cell { fill: none; stroke: color-mix(in srgb, var(--fg) 6%, transparent); stroke-width: 2; }
+.lnj-tr__ac { fill: var(--ac); }
+.lnj-tr__mid { fill: var(--mid); }
+
+.lnj-tr__kicker {
+    fill: var(--ac);
+    font: 700 34px var(--tt), monospace;
+    letter-spacing: 0.2em;
+}
+
+.lnj-tr__word {
+    fill: var(--fg);
+    font: 700 172px var(--sf), sans-serif;
+    letter-spacing: -0.03em;
+}
+
+.lnj-tr__cap {
+    fill: var(--mid);
+    font: 40px var(--tt), monospace;
+}
+
+.lnj-tr__mono {
+    fill: var(--fg);
+    font: 26px var(--tt), monospace;
+}
+
+.lnj-tr__brand {
+    fill: var(--fg);
+    font: 700 86px var(--sf), sans-serif;
+    letter-spacing: -0.02em;
+}
+
+.lnj-tr__handle {
+    fill: var(--bg);
+    font: 700 34px var(--tt), monospace;
+}
+
+/* phones: the frame is ~1/5 scale there, so the small lines grow to stay readable */
+@media (max-width: 640px) {
+    .lnj-tr__cap { font-size: 52px; }
+    .lnj-tr__tag { font-size: 46px; }
+}
+
+/* line art, as the About AMR: outlines in the text colour on the page colour, details in the accent */
+.lnj-trailer svg :is(path, rect, circle) { stroke-linecap: round; stroke-linejoin: round; }
+.lnj-tr__solid { fill: var(--bg); stroke: var(--fg); stroke-width: 7; }
+.lnj-tr__thin { stroke-width: 5; }
+.lnj-tr__line { fill: none; stroke: var(--fg); stroke-width: 5; }
+.lnj-tr__spokes { fill: none; stroke: var(--fg); stroke-width: 3; }
+.lnj-tr__hub { fill: var(--ac); stroke: none; }
+.lnj-tr__ink { fill: var(--fg); }
+.lnj-tr__led,
+.lnj-tr__led-on { fill: none; stroke: var(--ac); stroke-width: 6; }
+
+.lnj-tr__floor,
+.lnj-tr__road {
+    fill: none;
+    stroke: var(--mid);
+    stroke-width: 3;
+    stroke-dasharray: 16 12;
+}
+
+.lnj-tr__road { stroke-width: 4; }
+
+.lnj-tr__trail path {
+    fill: none;
+    stroke: var(--mid);
+    stroke-width: 4;
+    animation: lnj-amr-trail 0.7s linear infinite;
+}
+
+.lnj-tr__trail path:nth-child(2) { animation-delay: -0.25s; }
+.lnj-tr__trail path:nth-child(3) { animation-delay: -0.5s; }
+
+.lnj-tr__scan path {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 2.5;
+    stroke-dasharray: 4 9;
+    animation: lnj-amr-scan 0.5s linear infinite;
+}
+
+.lnj-tr__click {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 3;
+    opacity: 0;
+}
+
+.lnj-tr__click--mark { stroke-width: 10; }
+
+/* windows: the terminal, the map, the player */
+.lnj-tr__win {
+    fill: var(--bg);
+    stroke: color-mix(in srgb, var(--fg) 16%, transparent);
+    stroke-width: 4;
+}
+
+.lnj-tr__rule { stroke: color-mix(in srgb, var(--fg) 12%, transparent); stroke-width: 3; }
+.lnj-tr__light { fill: color-mix(in srgb, var(--fg) 22%, transparent); }
+.lnj-tr__cover { fill: var(--bg); }
+.lnj-tr__cur { fill: var(--ac); }
+.lnj-tr__blink { animation: lnj-tr-blink 1s steps(2, jump-none) infinite; }
+
+.lnj-tr__halo :is(path, rect, circle) {
+    fill: none;
+    stroke: color-mix(in srgb, var(--ac) 10%, transparent);
+    stroke-width: 64;
+}
+
+.lnj-tr__wall {
+    fill: none;
+    stroke: var(--fg);
+    stroke-width: 12;
+    stroke-dasharray: 100;
+}
+
+.lnj-tr__block { fill: color-mix(in srgb, var(--fg) 12%, var(--bg)); stroke: var(--fg); stroke-width: 6; }
+
+.lnj-tr__plan {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 6;
+    stroke-dasharray: 14 14;
+}
+
+.lnj-tr__plan-reveal {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 30;
+    stroke-dasharray: 100;
+}
+
+.lnj-tr__tread { fill: var(--fg); }
+.lnj-tr__body { stroke-width: 6; }
+.lnj-tr__lidar { stroke: var(--ac); stroke-width: 5; }
+.lnj-tr__tail { fill: none; stroke: var(--ac); stroke-width: 6; }
+
+.lnj-tr__sweep {
+    fill: color-mix(in srgb, var(--ac) 18%, transparent);
+    animation: lnj-404-sweep 1.2s linear infinite;
+}
+
+.lnj-tr__ping {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 3;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: lnj-tr-ping 1.2s ease-out infinite;
+}
+
+.lnj-tr__track { fill: color-mix(in srgb, var(--fg) 16%, transparent); }
+.lnj-tr__prog { fill: var(--ac); }
+.lnj-tr__play-icon { fill: var(--bg); }
+.lnj-tr__chip { fill: var(--bg); stroke: var(--ac); stroke-width: 4; }
+
+.lnj-tr__chip-text {
+    fill: var(--fg);
+    font: 700 28px var(--sf), sans-serif;
+}
+
+.lnj-tr__cube {
+    fill: color-mix(in srgb, var(--ac) 22%, var(--bg));
+    stroke: var(--ac);
+    stroke-width: 5;
+}
+
+/* still (reduced motion, or before the CSS loads): only the end card */
+.lnj-tr__scene { opacity: 0; }
+.lnj-tr__scene--end { opacity: 1; }
+
+/* which animation each part runs; origins other than the centre of its own box */
+.lnj-trailer .lnj-tr__scene { animation-name: lnj-tr-scene; }
+.lnj-trailer .lnj-tr__scene--end { animation-name: lnj-tr-scene-end; }
+.lnj-trailer :is(.lnj-tr__kicker, .lnj-tr__word, .lnj-tr__cap, .lnj-tr__brand) {
+    animation-name: lnj-tr-rise;
+    transform-origin: left bottom;
+}
+.lnj-trailer .lnj-tr__pop { animation-name: lnj-tr-pop; }
+.lnj-trailer .lnj-tr__click { animation-name: lnj-tr-click; }
+.lnj-trailer .lnj-tr__out { animation-name: lnj-tr-out; }
+
+.lnj-trailer .lnj-tr__floor { animation-name: lnj-tr-floor; }
+.lnj-trailer .lnj-tr__go { animation-name: lnj-tr-go; }
+.lnj-trailer .lnj-tr__trail { animation-name: lnj-tr-trail; }
+.lnj-trailer .lnj-tr__pitch { animation-name: lnj-tr-pitch; transform-origin: 40% 100%; }
+.lnj-trailer .lnj-tr__drop { animation-name: lnj-tr-drop; }
+.lnj-trailer .lnj-tr__squash { animation-name: lnj-tr-squash; transform-origin: 50% 100%; }
+.lnj-trailer .lnj-tr__spin { animation-name: lnj-tr-spin; }
+.lnj-trailer .lnj-tr__led { animation-name: lnj-tr-led; }
+.lnj-trailer .lnj-tr__scan { animation-name: lnj-tr-scan; }
+
+.lnj-trailer .lnj-tr__cover { transform-origin: right center; }
+.lnj-trailer .lnj-tr__cover--1 { animation-name: lnj-tr-type-1; }
+.lnj-trailer .lnj-tr__cover--3 { animation-name: lnj-tr-type-3; }
+.lnj-trailer .lnj-tr__cur--1 { animation-name: lnj-tr-cur-1; }
+.lnj-trailer .lnj-tr__cur--3 { animation-name: lnj-tr-cur-3; }
+
+.lnj-trailer .lnj-tr__wall { animation-name: lnj-tr-draw; }
+.lnj-trailer .lnj-tr__halo { animation-name: lnj-tr-fade; }
+.lnj-trailer .lnj-tr__plan-reveal { animation-name: lnj-tr-plan; }
+
+.lnj-trailer .lnj-tr__roll { animation-name: lnj-tr-roll; }
+.lnj-trailer .lnj-tr__prog { animation-name: lnj-tr-prog; transform-origin: left center; }
+.lnj-trailer .lnj-tr__play { animation-name: lnj-tr-play; }
+
+/* the arm's joints turn about their pivots (0 0), like the end card's mark */
+.lnj-trailer :is(.lnj-tr__a1, .lnj-tr__q2, .lnj-tr__q3) {
+    transform-box: view-box;
+    transform-origin: 0 0;
+}
+.lnj-trailer .lnj-tr__a1 { animation-name: lnj-tr-a1; }
+.lnj-trailer .lnj-tr__q2 { animation-name: lnj-tr-q2; }
+.lnj-trailer .lnj-tr__q3 { animation-name: lnj-tr-q3; }
+.lnj-trailer .lnj-tr__finger--l { animation-name: lnj-tr-finger-l; }
+.lnj-trailer .lnj-tr__finger--r { animation-name: lnj-tr-finger-r; }
+.lnj-trailer .lnj-tr__cube--floor { animation-name: lnj-tr-cube-floor; }
+.lnj-trailer .lnj-tr__cube--held { animation-name: lnj-tr-cube-held; }
+.lnj-trailer .lnj-tr__cube--placed { animation-name: lnj-tr-cube-placed; }
+
+/* the end card's mark: each part turns about 0 0, the pivot its group is translated to (as on the 404) */
+.lnj-trailer :is(.lnj-tr__mark, .lnj-tr__link, .lnj-tr__jy, .lnj-tr__js, .lnj-tr__jr) {
+    transform-box: view-box;
+    transform-origin: 0 0;
+}
+.lnj-trailer .lnj-tr__mark { animation-name: lnj-tr-mark; }
+.lnj-trailer .lnj-tr__link { animation-name: lnj-tr-link; }
+.lnj-trailer .lnj-tr__jy { animation-name: lnj-tr-jy; }
+.lnj-trailer .lnj-tr__js { animation-name: lnj-tr-js; }
+.lnj-trailer .lnj-tr__jr { animation-name: lnj-tr-jr; }
+
+/* chapters fade in and out (0.36 s); the end card holds longer */
+@keyframes lnj-tr-scene {
+    0% { opacity: 0; }
+    1.25%, 14.58% { opacity: 1; }
+    15.83%, 100% { opacity: 0; }
+}
+
+@keyframes lnj-tr-scene-end {
+    0% { opacity: 0; }
+    1.25%, 19.83% { opacity: 1; }
+    20.83%, 100% { opacity: 0; }
+}
+
+/* shared beats: text rises in, things pop in with a little overshoot, lines print, clicks ring out */
+@keyframes lnj-tr-rise {
+    0%, 0.83% { opacity: 0; transform: translateY(36px); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+    3.33%, 66.67% { opacity: 1; transform: translateY(0); }
+    66.75%, 100% { opacity: 0; transform: translateY(36px); }
+}
+
+@keyframes lnj-tr-pop {
+    0%, 0.83% { opacity: 0; transform: scale(0.9); animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+    3.33%, 66.67% { opacity: 1; transform: scale(1); }
+    66.75%, 100% { opacity: 0; transform: scale(0.9); }
+}
+
+@keyframes lnj-tr-out {
+    0%, 5.75% { opacity: 0; }
+    5.83%, 66.67% { opacity: 1; }
+    66.75%, 100% { opacity: 0; }
+}
+
+@keyframes lnj-tr-click {
+    0%, 3.71% { opacity: 0; transform: scale(0.4); }
+    3.75% { opacity: 0.9; transform: scale(0.5); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+    6.67%, 100% { opacity: 0; transform: scale(2.6); }
+}
+
+@keyframes lnj-tr-fade {
+    0%, 3.33% { opacity: 0; }
+    5.83%, 66.67% { opacity: 1; }
+    66.75%, 100% { opacity: 0; }
+}
+
+@keyframes lnj-tr-blink { 50% { opacity: 0; } }
+
+@keyframes lnj-tr-ping {
+    0% { opacity: 0.8; transform: scale(0.3); }
+    100% { opacity: 0; transform: scale(1); }
+}
+
+/* 01 Build: the floor rolls out, the wheels drop (a bounce each), then the body (squash), deck and lidar (click);
+   the LED flickers on, the lidar starts scanning, and it pitches back and accelerates out of frame */
+@keyframes lnj-tr-floor {
+    0%, 0.83% { transform: scaleX(0); }
+    4.17%, 100% { transform: scaleX(1); }
+}
+
+@keyframes lnj-tr-drop {
+    0%, 1.67% { transform: translateY(-220px); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    3.75% { transform: translateY(0); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    4.42% { transform: translateY(-10px); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    5%, 66.67% { transform: translateY(0); }
+    66.75%, 100% { transform: translateY(-220px); }
+}
+
+@keyframes lnj-tr-squash {
+    0%, 3.67% { transform: scale(1, 1); }
+    4.17% { transform: scale(1.08, 0.88); }
+    4.83% { transform: scale(0.97, 1.04); }
+    5.5%, 100% { transform: scale(1, 1); }
+}
+
+@keyframes lnj-tr-led {
+    0%, 8.75% { opacity: 0; }
+    9.17% { opacity: 1; }
+    9.67% { opacity: 0.3; }
+    10.17% { opacity: 1; }
+    10.67% { opacity: 0.3; }
+    11.17%, 100% { opacity: 1; }
+}
+
+@keyframes lnj-tr-scan {
+    0%, 9.58% { opacity: 0; }
+    10.83%, 100% { opacity: 1; }
+}
+
+@keyframes lnj-tr-go {
+    0%, 11.67% { transform: translateX(0); animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
+    15.83%, 100% { transform: translateX(300px); }
+}
+
+@keyframes lnj-tr-spin {
+    0%, 11.67% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
+    15.83%, 100% { transform: rotate(1080deg); }
+}
+
+@keyframes lnj-tr-pitch {
+    0%, 11.67% { transform: rotate(0deg); }
+    12.92% { transform: rotate(-4deg); }
+    15%, 100% { transform: rotate(0deg); }
+}
+
+@keyframes lnj-tr-trail {
+    0%, 12.08% { opacity: 0; }
+    13.33%, 100% { opacity: 1; }
+}
+
+/* 02 Code: a cover in the window's colour shrinks off each command a character at a time (30 and 45 of them),
+   the cursor riding its edge; output lines print whole */
+@keyframes lnj-tr-type-1 {
+    0%, 2.92% { transform: scaleX(1); animation-timing-function: steps(30, end); }
+    5.42%, 66.67% { transform: scaleX(0); }
+    66.75%, 100% { transform: scaleX(1); }
+}
+
+@keyframes lnj-tr-cur-1 {
+    0%, 2.42% { opacity: 0; transform: translateX(0); }
+    2.5%, 2.92% { opacity: 1; transform: translateX(0); animation-timing-function: steps(30, end); }
+    5.42%, 5.75% { opacity: 1; transform: translateX(420px); }
+    5.83%, 100% { opacity: 0; transform: translateX(420px); }
+}
+
+@keyframes lnj-tr-type-3 {
+    0%, 6.67% { transform: scaleX(1); animation-timing-function: steps(45, end); }
+    10%, 66.67% { transform: scaleX(0); }
+    66.75%, 100% { transform: scaleX(1); }
+}
+
+@keyframes lnj-tr-cur-3 {
+    0%, 6.17% { opacity: 0; transform: translateX(0); }
+    6.25%, 6.67% { opacity: 1; transform: translateX(0); animation-timing-function: steps(45, end); }
+    10%, 10.75% { opacity: 1; transform: translateX(630px); }
+    10.83%, 100% { opacity: 0; transform: translateX(630px); }
+}
+
+/* 04 Drive: walls draw and their inflation halo fades in, the plan draws (the robot's own drive, 1.875-3.75 s
+   into the chapter, is the animateMotion in the partial: keyTimes 0.5375-0.6 of the loop) */
+@keyframes lnj-tr-draw {
+    0%, 1.67% { stroke-dashoffset: 100; }
+    5%, 66.67% { stroke-dashoffset: 0; }
+    66.75%, 100% { stroke-dashoffset: 100; }
+}
+
+@keyframes lnj-tr-plan {
+    0%, 4.17% { stroke-dashoffset: 100; }
+    6.25%, 66.67% { stroke-dashoffset: 0; }
+    66.75%, 100% { stroke-dashoffset: 100; }
+}
+
+/* 05 Share: the play button pops, is pressed and fades as the video starts; the robot rolls, the bar fills */
+@keyframes lnj-tr-play {
+    0%, 2.5% { opacity: 1; transform: scale(0); animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+    4.17%, 5.5% { opacity: 1; transform: scale(1); }
+    5.83% { opacity: 1; transform: scale(0.86); }
+    6.33% { opacity: 1; transform: scale(1.03); }
+    6.83% { opacity: 1; transform: scale(1); }
+    7.92%, 66.67% { opacity: 0; transform: scale(1.25); }
+    66.75%, 100% { opacity: 1; transform: scale(0); }
+}
+
+@keyframes lnj-tr-roll {
+    0%, 6.67% { transform: translateX(0); animation-timing-function: linear; }
+    14.58%, 100% { transform: translateX(260px); }
+}
+
+@keyframes lnj-tr-prog {
+    0%, 6.67% { transform: scaleX(0); animation-timing-function: linear; }
+    14.58%, 66.67% { transform: scaleX(1); }
+    66.75%, 100% { transform: scaleX(0); }
+}
+
+/* end card: the link slides in spinning and overshoots; the joint falls (ease-in quad) spinning one and a half
+   turns, squashes as it seats (click), and the whole mark hops about its feet */
+@keyframes lnj-tr-link {
+    0%, 0.42% { transform: translateX(-2400px) rotate(-220deg); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+    3.33% { transform: translateX(30px) rotate(6deg); }
+    4.58%, 100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes lnj-tr-jy {
+    0%, 2.08% { transform: translateY(-1900px); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    4.58%, 100% { transform: translateY(0); }
+}
+
+@keyframes lnj-tr-jr {
+    0%, 2.08% { transform: rotate(-540deg); animation-timing-function: linear; }
+    4.58%, 100% { transform: rotate(0deg); }
+}
+
+@keyframes lnj-tr-js {
+    0%, 4.5% { transform: scale(1, 1); }
+    5.17% { transform: scale(1.12, 0.85); }
+    6% { transform: scale(0.96, 1.05); }
+    6.83%, 100% { transform: scale(1, 1); }
+}
+
+@keyframes lnj-tr-mark {
+    0%, 5.17% { transform: translateY(0) scale(1, 1); }
+    5.83% { transform: translateY(0) scale(1.06, 0.93); animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); }
+    7.17% { transform: translateY(-80px) scale(0.97, 1.04); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
+    8.5% { transform: translateY(0) scale(1.05, 0.95); }
+    9.33%, 100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* 03 Grab: joint angles (degrees) from inverse kinematics, elbow up, the wrist (q3) keeping the gripper at 90deg
+   (straight down) since a1 + q2 + q3 = 90 at every pose and in between. Poses (chapter time): rest (0-0.75 s), above
+   the cube (1.625 s), down on it (2-2.25 s: the fingers close, it swaps into the gripper at 2.125 s), lift
+   (2.875 s), above the stand (3.375 s), down on it (3.625-3.875 s: it swaps onto the stand at 3.65 s, the fingers
+   open), back to rest (4.5 s) */
+@keyframes lnj-tr-a1 {
+    0%, 2.5% { transform: rotate(-107.06deg); }
+    5.42% { transform: rotate(-42.49deg); }
+    6.67%, 7.5% { transform: rotate(-32.59deg); }
+    9.58% { transform: rotate(-68.87deg); }
+    11.25% { transform: rotate(-86.9deg); }
+    12.08%, 12.92% { transform: rotate(-81.14deg); }
+    15%, 100% { transform: rotate(-107.06deg); }
+}
+
+@keyframes lnj-tr-q2 {
+    0%, 2.5% { transform: rotate(114.22deg); }
+    5.42% { transform: rotate(68.7deg); }
+    6.67%, 7.5% { transform: rotate(71.92deg); }
+    9.58% { transform: rotate(77.86deg); }
+    11.25% { transform: rotate(107.46deg); }
+    12.08%, 12.92% { transform: rotate(116.18deg); }
+    15%, 100% { transform: rotate(114.22deg); }
+}
+
+@keyframes lnj-tr-q3 {
+    0%, 2.5% { transform: rotate(82.84deg); }
+    5.42% { transform: rotate(63.79deg); }
+    6.67%, 7.5% { transform: rotate(50.67deg); }
+    9.58% { transform: rotate(81.01deg); }
+    11.25% { transform: rotate(69.44deg); }
+    12.08%, 12.92% { transform: rotate(54.96deg); }
+    15%, 100% { transform: rotate(82.84deg); }
+}
+
+/* the parallel fingers: open 14 either side, closed on the cube */
+@keyframes lnj-tr-finger-l {
+    0%, 6.83% { transform: translateY(-14px); }
+    7.5%, 12.17% { transform: translateY(0); }
+    12.83%, 100% { transform: translateY(-14px); }
+}
+
+@keyframes lnj-tr-finger-r {
+    0%, 6.83% { transform: translateY(14px); }
+    7.5%, 12.17% { transform: translateY(0); }
+    12.83%, 100% { transform: translateY(14px); }
+}
+
+@keyframes lnj-tr-cube-floor {
+    0%, 7.08% { opacity: 1; }
+    7.09%, 100% { opacity: 0; }
+}
+
+@keyframes lnj-tr-cube-held {
+    0%, 7.08% { opacity: 0; }
+    7.09%, 12.17% { opacity: 1; }
+    12.18%, 100% { opacity: 0; }
+}
+
+@keyframes lnj-tr-cube-placed {
+    0%, 12.17% { opacity: 0; }
+    12.18%, 100% { opacity: 1; }
+}
+
+/* pause / play: a small round icon button in the bottom right corner (shown by the partial's script) */
+.lnj-trailer__toggle {
+    position: absolute;
+    right: 2.5%;
+    bottom: 4%;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    padding: 0;
+    width: clamp(1.6rem, 4.2%, 2.4rem);
+    aspect-ratio: 1;
+    color: var(--mid);
+    cursor: pointer;
+}
+
+.lnj-trailer__toggle[hidden] { display: none; }
+
+.lnj-trailer__toggle:hover,
+.lnj-trailer__toggle:focus-visible {
+    background: color-mix(in srgb, var(--fg) 10%, transparent);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--ac);
+}
+
+.lnj-trailer__toggle svg {
+    width: 62%;
+    height: 62%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.lnj-trailer__resume { fill: currentColor; stroke-width: 1.5; }
+.lnj-trailer__toggle .lnj-trailer__resume,
+.lnj-trailer__toggle[aria-pressed="true"] .lnj-trailer__pause { display: none; }
+.lnj-trailer__toggle[aria-pressed="true"] .lnj-trailer__resume { display: inline; }
+
+@media (prefers-reduced-motion: reduce) {
+    .lnj-trailer *,
+    .lnj-trailer *::before {
+        animation: none !important;
+    }
+
+    .lnj-trailer__toggle { display: none; }
 }

@@ -1,0 +1,350 @@
+{{- /*
+    The home hero: an animated "channel trailer" in the 16:9 image slot (partials/hero.html, `trailer: true` in
+    content/_index.md). One endless 30 s loop of five chapters: 01 Build (an AMR drops together part by part,
+    powers up, drives off), 02 Code (a terminal types a colcon build and a Nav2 launch), 03 Grab (an arm picks a
+    cube off the floor and sets it on a stand), 04 Drive (top-down map: walls draw, the plan draws, the robot
+    follows it to the goal with its lidar sweeping), 05 Share (a video of the robot starts playing; Videos / Tools /
+    Docs pop up), then the end card (the LnJ mark snaps together, as on the 404, with the name and the handle).
+    Chapters start at 0, 4.75, 9.5, 14.25, 19 and 23.75 s; each sets `--d` (its start) and its parts add `--o`
+    (their own offset), so all keyframes are written in chapter time (custom.css "Home trailer"). Everything is
+    CSS but the robot's path in 04 (SMIL animateMotion, kept in step with the CSS clock by the script below, which
+    also pauses it off screen, in a hidden tab or with the button). Reduced motion: the end card, still.
+*/ -}}
+{{- $logo := readFile "static/images/brand/lnj-studios-ink.svg" }}
+{{- $mark := findRESubmatch `<path d="([^"]+)"` $logo 2 }}
+{{- $link := index (index $mark 0) 1 }}
+{{- $joint := index (index $mark 1) 1 }}
+{{- $plan := "M850 590C850 470 930 440 1040 440S1180 470 1240 440S1380 300 1420 270" }}
+<div class="hero__image lnj-trailer">
+    <svg class="lnj-trailer__svg" viewBox="0 0 1600 900" role="img"
+        aria-label="Channel trailer: build robots, code them, give them hands, drive them, share it all. Links &amp; Joints Studios, @linksnjoints on YouTube">
+        <defs>
+            <pattern id="lnj-tr-dots" width="40" height="40" patternUnits="userSpaceOnUse">
+                <circle class="lnj-tr__dot-grid" cx="20" cy="20" r="2"/>
+            </pattern>
+            <pattern id="lnj-tr-cells" x="760" y="170" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path class="lnj-tr__cell" d="M40 0H0V40"/>
+            </pattern>
+            {{- /* 04: the dashed plan shows through a solid stroke that draws along it */}}
+            <mask id="lnj-tr-plan" maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="900">
+                <path class="lnj-tr__plan-reveal an" pathLength="100" d="{{ $plan }}" style="--d: 14.25s"/>
+            </mask>
+            <clipPath id="lnj-tr-map">
+                <rect x="760" y="170" width="740" height="500" rx="22"/>
+            </clipPath>
+            <clipPath id="lnj-tr-screen">
+                <rect x="760" y="190" width="740" height="416" rx="22"/>
+            </clipPath>
+        </defs>
+
+        <rect class="lnj-tr__bg" width="1600" height="900"/>
+        <rect width="1600" height="900" fill="url(#lnj-tr-dots)"/>
+
+        {{- /* 01 Build: the About page's AMR (its units, x3), dropped in part by part */}}
+        <g class="lnj-tr__scene an" style="--d: 0s">
+            <text class="lnj-tr__kicker an" x="124" y="330">01 / 05</text>
+            <text class="lnj-tr__word an" x="116" y="500" style="--o: 0.1s">Build<tspan class="lnj-tr__ac">.</tspan></text>
+            <text class="lnj-tr__cap an" x="124" y="575" style="--o: 0.2s">robots, from scratch</text>
+            <g transform="translate(730 80) scale(3)">
+                <path class="lnj-tr__floor an" d="M20 171H236"/>
+                <g class="lnj-tr__go an">
+                    <g class="lnj-tr__trail an">
+                        <path d="M14 114h40"/>
+                        <path d="M2 130h46"/>
+                        <path d="M22 146h30"/>
+                    </g>
+                    <g class="lnj-tr__pitch an">
+                        <g class="lnj-tr__drop an" style="--o: 1s">
+                            <path class="lnj-tr__line" d="M90 106V93h58v13"/>
+                        </g>
+                        <g class="lnj-tr__drop an" style="--o: 0.6s">
+                            <g class="lnj-tr__squash an">
+                                <rect class="lnj-tr__solid" x="66" y="106" width="134" height="42" rx="13"/>
+                                <path class="lnj-tr__led an" d="M84 127h34" style="--o: 0s"/>
+                            </g>
+                        </g>
+                        <g class="lnj-tr__drop an" style="--o: 1.3s">
+                            <g class="lnj-tr__squash an">
+                                <g class="lnj-tr__scan an" style="--o: 0s">
+                                    <path d="M190 98 226 83M190 98h36M190 98l36 15"/>
+                                </g>
+                                <rect class="lnj-tr__solid lnj-tr__thin" x="180" y="90" width="20" height="16" rx="4"/>
+                            </g>
+                        </g>
+                        <circle class="lnj-tr__click an" cx="190" cy="98" r="16" style="--o: 1.3s"/>
+                        {{- range $i, $x := slice 98 166 }}
+                            <g class="lnj-tr__drop an" style="--o: {{ mul $i 0.25 }}s">
+                                <g class="lnj-tr__spin an" style="--o: 0s">
+                                    <circle class="lnj-tr__solid" cx="{{ $x }}" cy="154" r="15"/>
+                                    <path class="lnj-tr__spokes" d="M{{ $x }} 143v22M{{ sub $x 11 }} 154h22"/>
+                                    <circle class="lnj-tr__hub" cx="{{ $x }}" cy="154" r="5"/>
+                                </g>
+                            </g>
+                        {{- end }}
+                    </g>
+                </g>
+            </g>
+        </g>
+
+        {{- /* 02 Code: real commands and real log lines; each typed line is uncovered a character at a time
+               (textLength fixes the width, 14 per character, whatever the monospace font) */}}
+        <g class="lnj-tr__scene an" style="--d: 4.75s">
+            <text class="lnj-tr__kicker an" x="124" y="330">02 / 05</text>
+            <text class="lnj-tr__word an" x="116" y="500" style="--o: 0.1s">Code<tspan class="lnj-tr__ac">.</tspan></text>
+            <text class="lnj-tr__cap an" x="124" y="575" style="--o: 0.2s">ROS 2 · micro-ROS</text>
+            <g class="lnj-tr__pop an">
+                <rect class="lnj-tr__win" x="760" y="190" width="740" height="440" rx="22"/>
+                <path class="lnj-tr__rule" d="M760 250H1500"/>
+                <circle class="lnj-tr__hub" cx="802" cy="220" r="9"/>
+                <circle class="lnj-tr__light" cx="832" cy="220" r="9"/>
+                <circle class="lnj-tr__light" cx="862" cy="220" r="9"/>
+                <text class="lnj-tr__mono lnj-tr__mid" x="1130" y="228" text-anchor="middle">~/ros2_ws</text>
+
+                <text class="lnj-tr__mono lnj-tr__ac" x="795" y="315">$</text>
+                <text class="lnj-tr__mono" x="823" y="315" textLength="420" lengthAdjust="spacingAndGlyphs">colcon build --symlink-install</text>
+                <rect class="lnj-tr__cover lnj-tr__cover--1 an" x="823" y="288" width="420" height="36"/>
+                <rect class="lnj-tr__cur lnj-tr__cur--1 an" x="823" y="291" width="14" height="30"/>
+
+                <text class="lnj-tr__mono lnj-tr__mid lnj-tr__out an" x="795" y="360">Summary: 6 packages finished [42.1s]</text>
+
+                <text class="lnj-tr__mono lnj-tr__ac lnj-tr__out an" x="795" y="430" style="--o: 0.125s">$</text>
+                <text class="lnj-tr__mono" x="823" y="430" textLength="630" lengthAdjust="spacingAndGlyphs">ros2 launch nav2_bringup navigation_launch.py</text>
+                <rect class="lnj-tr__cover lnj-tr__cover--3 an" x="823" y="403" width="630" height="36"/>
+                <rect class="lnj-tr__cur lnj-tr__cur--3 an" x="823" y="406" width="14" height="30"/>
+
+                <text class="lnj-tr__mono lnj-tr__out an" x="795" y="475" style="--o: 1.5s"><tspan class="lnj-tr__ac">[INFO]</tspan> Managed nodes are active</text>
+
+                <g class="lnj-tr__out an" style="--o: 1.625s">
+                    <text class="lnj-tr__mono lnj-tr__ac" x="795" y="545">$</text>
+                    <rect class="lnj-tr__cur lnj-tr__blink" x="823" y="521" width="14" height="30"/>
+                </g>
+            </g>
+        </g>
+
+        {{- /* 03 Grab: a three-joint arm on a turret (shoulder at 1000 560, links 200 and 170) picks a cube off the
+               floor and sets it on the stand. Each joint is a group translated to its pivot, turning about 0 0; the
+               poses are inverse kinematics, elbow up, with the wrist keeping the gripper pointing straight down
+               (custom.css lnj-tr-a1 / -q2 / -q3). The cube swaps between floor, gripper and stand copies */}}
+        <g class="lnj-tr__scene an" style="--d: 9.5s">
+            <text class="lnj-tr__kicker an" x="124" y="330">03 / 05</text>
+            <text class="lnj-tr__word an" x="116" y="500" style="--o: 0.1s">Grab<tspan class="lnj-tr__ac">.</tspan></text>
+            <text class="lnj-tr__cap an" x="124" y="575" style="--o: 0.2s">arms · grippers · URDF</text>
+            <path class="lnj-tr__road" d="M790 640H1480"/>
+            <g class="lnj-tr__pop an">
+                <rect class="lnj-tr__block" x="1130" y="540" width="80" height="100" rx="8"/>
+            </g>
+            <rect class="lnj-tr__cube lnj-tr__cube--floor an" x="1270" y="580" width="60" height="60" rx="8"/>
+            <rect class="lnj-tr__cube lnj-tr__cube--placed an" x="1140" y="480" width="60" height="60" rx="8"/>
+            <circle class="lnj-tr__click an" cx="1300" cy="610" r="40" style="--o: 1.025s"/>
+            <circle class="lnj-tr__click an" cx="1170" cy="510" r="40" style="--o: 2.525s"/>
+            <g class="lnj-tr__pop an">
+                <rect class="lnj-tr__solid" x="940" y="612" width="120" height="28" rx="8"/>
+                <rect class="lnj-tr__solid" x="970" y="566" width="60" height="50" rx="10"/>
+                <g transform="translate(1000 560)">
+                    <g class="lnj-tr__a1 an">
+                        <rect class="lnj-tr__solid" x="-20" y="-20" width="240" height="40" rx="20"/>
+                        <g transform="translate(200 0)">
+                            <g class="lnj-tr__q2 an">
+                                <rect class="lnj-tr__solid" x="-16" y="-16" width="202" height="32" rx="16"/>
+                                <g transform="translate(170 0)">
+                                    <g class="lnj-tr__q3 an">
+                                        <rect class="lnj-tr__cube lnj-tr__cube--held an" x="20" y="-30" width="60" height="60" rx="8"/>
+                                        <g class="lnj-tr__finger lnj-tr__finger--l an">
+                                            <rect class="lnj-tr__solid lnj-tr__thin" x="18" y="-42" width="62" height="12" rx="5"/>
+                                        </g>
+                                        <g class="lnj-tr__finger lnj-tr__finger--r an">
+                                            <rect class="lnj-tr__solid lnj-tr__thin" x="18" y="30" width="62" height="12" rx="5"/>
+                                        </g>
+                                        <rect class="lnj-tr__solid lnj-tr__thin" x="6" y="-58" width="16" height="116" rx="6"/>
+                                        <circle class="lnj-tr__hub" r="10"/>
+                                    </g>
+                                </g>
+                            </g>
+                            <circle class="lnj-tr__hub" r="11"/>
+                        </g>
+                    </g>
+                    <circle class="lnj-tr__hub" r="13"/>
+                </g>
+            </g>
+        </g>
+
+        {{- /* 04 Drive: an occupancy map with its inflation halo; the robot (top-down, facing +x) follows the plan */}}
+        <g class="lnj-tr__scene an" style="--d: 14.25s">
+            <text class="lnj-tr__kicker an" x="124" y="330">04 / 05</text>
+            <text class="lnj-tr__word an" x="116" y="500" style="--o: 0.1s">Drive<tspan class="lnj-tr__ac">.</tspan></text>
+            <text class="lnj-tr__cap an" x="124" y="575" style="--o: 0.2s">Nav2 · ros2_control</text>
+            <g class="lnj-tr__pop an">
+                <rect class="lnj-tr__win" x="760" y="170" width="740" height="500" rx="22"/>
+                <rect x="760" y="170" width="740" height="500" rx="22" fill="url(#lnj-tr-cells)"/>
+            </g>
+            <g clip-path="url(#lnj-tr-map)">
+                <g class="lnj-tr__halo an">
+                    <path d="M1000 170V350M1200 670V540H1280"/>
+                    <rect x="1340" y="500" width="72" height="72" rx="10"/>
+                    <rect x="800" y="210" width="130" height="54" rx="10"/>
+                    <circle cx="1120" cy="300" r="24"/>
+                </g>
+                <path class="lnj-tr__wall an" pathLength="100" d="M1000 170V350M1200 670V540H1280"/>
+                <g class="lnj-tr__pop an" style="--o: 0.5s">
+                    <rect class="lnj-tr__block" x="1340" y="500" width="72" height="72" rx="10"/>
+                </g>
+                <g class="lnj-tr__pop an" style="--o: 0.6s">
+                    <rect class="lnj-tr__block" x="800" y="210" width="130" height="54" rx="10"/>
+                </g>
+                <g class="lnj-tr__pop an" style="--o: 0.7s">
+                    <circle class="lnj-tr__block" cx="1120" cy="300" r="24"/>
+                </g>
+                <path class="lnj-tr__plan" d="{{ $plan }}" mask="url(#lnj-tr-plan)"/>
+                <g class="lnj-tr__pop an" style="--o: 0.8s">
+                    <circle class="lnj-tr__ping" cx="1420" cy="270" r="34"/>
+                    <circle class="lnj-tr__hub" cx="1420" cy="270" r="13"/>
+                </g>
+                <circle class="lnj-tr__click an" cx="1420" cy="270" r="30" style="--o: 2.625s"/>
+                <text class="lnj-tr__mono lnj-tr__ac lnj-tr__out an" x="1470" y="222" text-anchor="end" style="--o: 1.575s">goal reached</text>
+                <g class="lnj-tr__pop an" style="--o: 0.5s">
+                    <g>
+                        <animateMotion dur="30s" repeatCount="indefinite" rotate="auto" calcMode="spline"
+                            keyPoints="0;0;1;1" keyTimes="0;0.5375;0.6;1" keySplines="0 0 1 1;0.45 0 0.55 1;0 0 1 1"
+                            path="{{ $plan }}"/>
+                        <g transform="translate(10 0)">
+                            <g class="lnj-tr__sweep">
+                                <path d="M0 0 170 -62A181 181 0 0 1 170 62Z"/>
+                            </g>
+                            <circle class="lnj-tr__ping" r="60"/>
+                        </g>
+                        <rect class="lnj-tr__tread" x="-22" y="-38" width="44" height="12" rx="4"/>
+                        <rect class="lnj-tr__tread" x="-22" y="26" width="44" height="12" rx="4"/>
+                        <rect class="lnj-tr__solid lnj-tr__body" x="-36" y="-28" width="72" height="56" rx="16"/>
+                        <circle class="lnj-tr__solid lnj-tr__lidar" cx="10" r="11"/>
+                        <path class="lnj-tr__tail" d="M-22 -12v24"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+
+        {{- /* 05 Share: the robot from 01 on video; the play button pops, is pressed, and it rolls */}}
+        <g class="lnj-tr__scene an" style="--d: 19s">
+            <text class="lnj-tr__kicker an" x="124" y="330">05 / 05</text>
+            <text class="lnj-tr__word an" x="116" y="500" style="--o: 0.1s">Share<tspan class="lnj-tr__ac">.</tspan></text>
+            <text class="lnj-tr__cap an" x="124" y="575" style="--o: 0.2s">every build, filmed</text>
+            <g class="lnj-tr__pop an">
+                <rect class="lnj-tr__win" x="760" y="190" width="740" height="416" rx="22"/>
+                <g clip-path="url(#lnj-tr-screen)">
+                    <path class="lnj-tr__road" d="M760 557H1500"/>
+                    <g class="lnj-tr__roll an">
+                        <g transform="translate(800 300) scale(1.5)">
+                            <path class="lnj-tr__line" d="M90 106V93h58v13"/>
+                            <rect class="lnj-tr__solid" x="66" y="106" width="134" height="42" rx="13"/>
+                            <path class="lnj-tr__led-on" d="M84 127h34"/>
+                            <rect class="lnj-tr__solid lnj-tr__thin" x="180" y="90" width="20" height="16" rx="4"/>
+                            <circle class="lnj-tr__solid" cx="98" cy="154" r="15"/>
+                            <circle class="lnj-tr__solid" cx="166" cy="154" r="15"/>
+                            <circle class="lnj-tr__hub" cx="98" cy="154" r="5"/>
+                            <circle class="lnj-tr__hub" cx="166" cy="154" r="5"/>
+                        </g>
+                    </g>
+                </g>
+                <rect class="lnj-tr__track" x="800" y="574" width="660" height="8" rx="4"/>
+                <rect class="lnj-tr__prog an" x="800" y="574" width="660" height="8" rx="4"/>
+                <g class="lnj-tr__play an">
+                    <circle class="lnj-tr__hub" cx="1130" cy="398" r="64"/>
+                    <path class="lnj-tr__play-icon" d="M1110 366 1158 398 1110 430Z"/>
+                </g>
+                <circle class="lnj-tr__click an" cx="1130" cy="398" r="64" style="--o: 0.625s"/>
+            </g>
+            {{- range $i, $c := slice (slice "Videos" 760 196) (slice "Tools" 976 170) (slice "Docs" 1166 156) }}
+                <g class="lnj-tr__pop an" style="--o: {{ add 2 (mul $i 0.25) }}s">
+                    <rect class="lnj-tr__chip" x="{{ index $c 1 }}" y="646" width="{{ index $c 2 }}" height="60" rx="30"/>
+                    <text class="lnj-tr__chip-text" x="{{ add (index $c 1) (div (index $c 2) 2) }}" y="686" text-anchor="middle">{{ index $c 0 }}</text>
+                </g>
+            {{- end }}
+        </g>
+
+        {{- /* end card: the LnJ mark (the logo's two paths, as on the 404) snaps together: the link slides in, the
+               joint drops onto it spinning and seats with a click, the mark hops; then the name and the handle.
+               The mark's centre is 529 541 in logo units, its feet 356 below; each part turns about its own centre */}}
+        <g class="lnj-tr__scene lnj-tr__scene--end an" style="--d: 23.75s">
+            <g transform="translate(800 320) scale(0.34)">
+                <g transform="translate(0 356)">
+                    <g class="lnj-tr__mark an">
+                        <g transform="translate(-48 -405)">
+                            <g class="lnj-tr__link an">
+                                <path class="lnj-tr__ink" transform="translate(-481 -492) rotate(-45 540 540)" d="{{ $link }}"/>
+                            </g>
+                        </g>
+                        <g transform="translate(81 -244)">
+                            <g class="lnj-tr__jy an">
+                                <g transform="translate(0 244)">
+                                    <g class="lnj-tr__js an">
+                                        <g transform="translate(0 -244)">
+                                            <g class="lnj-tr__jr an">
+                                                <path class="lnj-tr__hub" transform="translate(-610 -653) rotate(-45 540 540)" d="{{ $joint }}"/>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                        <circle class="lnj-tr__click lnj-tr__click--mark an" cx="40" cy="-250" r="70" style="--o: 0.25s"/>
+                    </g>
+                </g>
+            </g>
+            <text class="lnj-tr__brand an" x="800" y="560" text-anchor="middle" style="--o: 1.1s">Links &amp; Joints Studios</text>
+            <text class="lnj-tr__cap lnj-tr__tag an" x="800" y="626" text-anchor="middle" style="--o: 1.35s">build · code · grab · drive · share</text>
+            <g class="lnj-tr__pop an" style="--o: 1.6s">
+                <rect class="lnj-tr__hub" x="590" y="672" width="420" height="72" rx="36"/>
+                <path class="lnj-tr__play-icon" d="M636 692 664 708 636 724Z"/>
+                <text class="lnj-tr__handle" x="826" y="720" text-anchor="middle">@linksnjoints</text>
+            </g>
+        </g>
+
+    </svg>
+    <button class="lnj-trailer__toggle" type="button" aria-pressed="false" aria-label="Pause the trailer" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path class="lnj-trailer__pause" d="M8.5 5v14M15.5 5v14"/>
+            <path class="lnj-trailer__resume" d="M7.5 4.8v14.4L19 12z"/>
+        </svg>
+    </button>
+    <script>
+        (() => {
+            const box = document.currentScript.parentElement;
+            const svg = box.querySelector('svg');
+            const clock = box.querySelector('.lnj-tr__scene'); // chapter 01: starts at 0, one pass per loop
+            const button = box.querySelector('.lnj-trailer__toggle');
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                svg.pauseAnimations();
+                return;
+            }
+            let held = false;
+            let seen = true;
+            // runs while on screen, in a visible tab and not paused with the button; the robot's SMIL path is
+            // set to the CSS clock whenever it starts again, so the two never drift apart
+            const sync = () => {
+                const run = !held && seen && !document.hidden;
+                box.classList.toggle('is-paused', !run);
+                if (!run) {
+                    svg.pauseAnimations();
+                    return;
+                }
+                const anim = clock.getAnimations ? clock.getAnimations()[0] : null;
+                if (anim && anim.currentTime !== null) svg.setCurrentTime((anim.currentTime % 30000) / 1000);
+                svg.unpauseAnimations();
+            };
+            button.hidden = false;
+            button.addEventListener('click', () => {
+                held = !held;
+                button.setAttribute('aria-pressed', held);
+                button.setAttribute('aria-label', held ? 'Play the trailer' : 'Pause the trailer');
+                sync();
+            });
+            if ('IntersectionObserver' in window) {
+                new IntersectionObserver(([entry]) => {
+                    seen = entry.isIntersecting;
+                    sync();
+                }).observe(box);
+            }
+            document.addEventListener('visibilitychange', sync);
+            sync();
+        })();
+    </script>
+</div>

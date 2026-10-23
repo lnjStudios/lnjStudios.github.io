@@ -30,8 +30,9 @@ Hugo page; never add a `/ros-man` page or path, and don't break that redirect.
 ## Layout
 
 - `hugo.toml`: site config, brewm params (logo, accent colours, fonts, search), menus (`main`, `more`, `footer` icons).
-- `content/` root holds only `_index.md` (home greeter; its `cover` is the 16:9 hero image, currently a hotlinked
-  brewm flowline placeholder) and folders; every page gets its own folder (`about/index.md`, `write/index.md`).
+- `content/` root holds only `_index.md` (home greeter; `trailer: true` puts the animated channel trailer in the
+  16:9 hero slot, see below; its `cover`, a hotlinked brewm flowline placeholder, is now only the share image)
+  and folders; every page gets its own folder (`about/index.md`, `write/index.md`).
   Don't put loose `.md` files there. Headless things use Hugo's `build` options (`render: never`), not brewm's
   `params.headless` / `target`, which publish a redirect page per file.
 - `content/essentials/`: site building blocks, no page or URL of their own (cascaded `build: render: never`):
@@ -89,6 +90,17 @@ Hugo page; never add a `/ros-man` page or path, and don't break that redirect.
   `body.lnj-chrome-hidden`); never while Settings is open or search has focus.
 - Home pane layout (desktop), keep it: left column = title card (logo) over the slides pane; right = categories
   on top, then the photo + recent posts, with the greeter text + Discover topics in a narrow column beside them.
+- **Home trailer** (`layouts/partials/home-trailer.html`, called from our `partials/hero.html` override of brewm's inline
+  hero when the page has `trailer: true`; styles `custom.css` "Home trailer"): a 30 s looping "channel trailer": 01 Build (the
+  About AMR drops together, powers up, drives off), 02 Code (a terminal types `colcon build` + a Nav2 launch), 03 Grab
+  (a 3-joint arm with a gripper picks a cube off the floor onto a stand; IK poses in the keyframes), 04 Drive
+  (top-down map, the plan draws, the robot follows it), 05 Share (a video of the robot plays; Videos / Tools / Docs),
+  then the end card (the LnJ mark snaps together as on the 404, name, `@linksnjoints`). Chapters start at
+  0 / 4.75 / 9.5 / 14.25 / 19 / 23.75 s; each sets `--d`, parts add `--o`, so keyframes are in chapter time (1 % = 0.3 s);
+  offset parts reset 20 s into their loop (while off screen). CSS only except the robot's path in 04 (SMIL
+  `animateMotion`, keyTimes in loop fractions); the inline script re-syncs it to the CSS clock and pauses it all
+  off screen, in a hidden tab or with the small pause button (bottom right). Base styles = the end card (what reduced motion shows).
+  The greeter text beside it is one block centred on its height (h1 then paragraphs, no stretched gap).
 - No top or bottom bar, not even their space: `--vhead` / `--vfoot` are forced to 0 in `custom.css`. The header
   is just the logo. Desktop home: the whole left column (title card + slides pane) is `position: fixed`; only the
   right side scrolls. The logo is the "title card", sized and centred on the category cards' row

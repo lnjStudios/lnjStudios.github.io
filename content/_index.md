@@ -3,6 +3,7 @@ title: Links & Joints Studios
 description: Robots, open-source tools and experiments from a one-person robotics workshop.
 cover: https://raw.githubusercontent.com/foxihd/hugo-et-hd/master/static/svg/flowlines/22.svg
 alt: Flowing contour lines (placeholder until the workbench photo is in)
+trailer: true  # the hero is the animated channel trailer (layouts/partials/home-trailer.html); cover is still the share image
 ---
 
 # Where creativity meets tech

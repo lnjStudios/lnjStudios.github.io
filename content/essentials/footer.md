@@ -4,9 +4,9 @@
 # (params.copyright, menus.footer).
 title: Links & Joints Studios
 links:
+  - {label: YouTube, url: 'https://youtube.com/@linksnjoints'}
   - {label: Links & Docs, url: 'https://docs.lnjstudios.com/'}
-  - {label: ROS-Manager on GitHub, url: 'https://github.com/koustavbetal/ros_manager'}
-  - {label: YouTube channel, url: 'https://youtube.com/@linksnjoints'}
+  - {label: About Us, url: '/about'}
 ---
 
 An attempt to democratise all the knowledge of how to robot!!

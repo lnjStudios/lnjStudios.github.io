@@ -150,12 +150,12 @@ ignoreFiles = ['\.redacted$', '\.old$', '\.bak$', '\.tmp$', '\.swp$', '\.DS_Stor
 [menus]
 	# No header (Tools/Notes live in the home categories; About and RSS are in the Settings panel)
 
-	[[menus.footer]]
-		identifier = 'youtube'
-		name = 'YouTube'
-		url = 'https://youtube.com/@linksnjoints'
-		pre = 'youtube'
-		weight = 1
+	# [[menus.footer]]
+	# 	identifier = 'youtube'
+	# 	name = 'YouTube'
+	# 	url = 'https://youtube.com/@linksnjoints'
+	# 	pre = 'youtube'
+	# 	weight = 1
 	[[menus.footer]]
 		identifier = 'github'
 		name = 'GitHub'

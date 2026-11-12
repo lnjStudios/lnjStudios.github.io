@@ -3293,14 +3293,14 @@ html body #main-footer.lnj-footer {
     border-radius: 0.9rem;
     background: color-mix(in srgb, var(--fg) 5%, var(--bg));
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 7%, transparent), inset 0 -2px 0 0 var(--ac);
-    padding: 2.25rem 2.5rem 1.5rem;
+    padding: 1.25rem 2.5rem 0.9rem;
     width: calc(100% - 2 * var(--lnj-rail-lane)); /* page width, less the rail's lane on both sides */
     color: var(--fg);
     font-family: var(--sf), sans-serif;
 }
 
-/* brewm pads its footer's columns out to the page gutter (sideways only: our rows keep their own top padding)
-   and gives every footer link 2pt of padding (which would squash the pills) */
+/* brewm pads its footer's columns out to the page gutter (and zeroes their top / bottom padding, so the bottom
+   row sets its own with a stronger selector) and gives every footer link 2pt of padding (which would squash the pills) */
 #main-footer.lnj-footer > div {
     padding-right: 0;
     padding-left: 0;
@@ -3375,15 +3375,17 @@ html body #main-footer.lnj-footer {
     gap: 0.6rem;
 }
 
-.lnj-footer__bottom {
+/* ids in the selector: brewm's `#main-footer > div` padding would otherwise zero the top padding, sitting the
+   icons on the rule (and lifting into it on hover) */
+#main-footer.lnj-footer > .lnj-footer__bottom {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: 0.75rem 1.5rem;
-    margin-top: 1.25rem;
+    margin-top: 0.6rem; /* same as the space under the rule */
     border-top: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
-    padding-top: 1rem;
+    padding-top: 0.6rem; /* taken off the card's bottom padding, so the footer keeps its height */
 }
 
 html body #main-footer .lnj-footer__legal {
@@ -3429,7 +3431,7 @@ html body #main-footer .lnj-footer__legal {
         margin-bottom: calc(var(--lnj-dock-bottom) + var(--lnj-rail-n) * var(--lnj-dock-h)
             + (var(--lnj-rail-n) - 1) * 0.5rem + 1rem);
         width: calc(100% - 2.5rem); /* the phones' 1.25rem text gutter */
-        padding: 1.25rem 1.1rem 1rem;
+        padding: 0.9rem 1.1rem 0.4rem;
     }
 
     .lnj-footer__links {
@@ -3744,7 +3746,8 @@ html body #main-footer .lnj-footer__legal {
 }
 
 /* ------------------------------------------------------------------
-   Home trailer (layouts/partials/home-trailer.html, the hero on home): a 30 s "channel trailer". Chapters
+   Home trailer (layouts/partials/home-trailer.html, the hero on home): a 30 s "channel trailer", one robot's
+   story (built, crashes, fixed, drives, shared); the first one is kept in assets/css/archive/. Chapters
    start at 0 / 4.75 / 9.5 / 14.25 / 19 s and are 4.75 s long (15.83 % of the loop); the end card starts at
    23.75 s and runs 6.25 s. Every `.an` runs the 30 s loop delayed by its chapter's start (`--d`) plus its own
    offset (`--o`), so its keyframes are in chapter time: 1 % = 0.3 s, a chapter is 0-15.83 %. Parts with an
@@ -3789,15 +3792,10 @@ html #home .hero__image.lnj-trailer {
 .lnj-tr__ac { fill: var(--ac); }
 .lnj-tr__mid { fill: var(--mid); }
 
-.lnj-tr__kicker {
-    fill: var(--ac);
-    font: 700 34px var(--tt), monospace;
-    letter-spacing: 0.2em;
-}
-
-.lnj-tr__word {
+/* the story line, two or three lines a chapter (~10 characters each, to stay clear of the windows at 760) */
+.lnj-tr__say {
     fill: var(--fg);
-    font: 700 172px var(--sf), sans-serif;
+    font: 700 104px var(--sf), sans-serif;
     letter-spacing: -0.03em;
 }
 
@@ -3849,16 +3847,6 @@ html #home .hero__image.lnj-trailer {
 
 .lnj-tr__road { stroke-width: 4; }
 
-.lnj-tr__trail path {
-    fill: none;
-    stroke: var(--mid);
-    stroke-width: 4;
-    animation: lnj-amr-trail 0.7s linear infinite;
-}
-
-.lnj-tr__trail path:nth-child(2) { animation-delay: -0.25s; }
-.lnj-tr__trail path:nth-child(3) { animation-delay: -0.5s; }
-
 .lnj-tr__scan path {
     fill: none;
     stroke: var(--ac);
@@ -3887,7 +3875,7 @@ html #home .hero__image.lnj-trailer {
 .lnj-tr__light { fill: color-mix(in srgb, var(--fg) 22%, transparent); }
 .lnj-tr__cover { fill: var(--bg); }
 .lnj-tr__cur { fill: var(--ac); }
-.lnj-tr__blink { animation: lnj-tr-blink 1s steps(2, jump-none) infinite; }
+.lnj-tr__strike { fill: none; stroke: var(--fg); stroke-width: 3; }
 
 .lnj-tr__halo :is(path, rect, circle) {
     fill: none;
@@ -3947,12 +3935,6 @@ html #home .hero__image.lnj-trailer {
     font: 700 28px var(--sf), sans-serif;
 }
 
-.lnj-tr__cube {
-    fill: color-mix(in srgb, var(--ac) 22%, var(--bg));
-    stroke: var(--ac);
-    stroke-width: 5;
-}
-
 /* still (reduced motion, or before the CSS loads): only the end card */
 .lnj-tr__scene { opacity: 0; }
 .lnj-tr__scene--end { opacity: 1; }
@@ -3960,7 +3942,7 @@ html #home .hero__image.lnj-trailer {
 /* which animation each part runs; origins other than the centre of its own box */
 .lnj-trailer .lnj-tr__scene { animation-name: lnj-tr-scene; }
 .lnj-trailer .lnj-tr__scene--end { animation-name: lnj-tr-scene-end; }
-.lnj-trailer :is(.lnj-tr__kicker, .lnj-tr__word, .lnj-tr__cap, .lnj-tr__brand) {
+.lnj-trailer :is(.lnj-tr__say, .lnj-tr__cap, .lnj-tr__brand) {
     animation-name: lnj-tr-rise;
     transform-origin: left bottom;
 }
@@ -3969,20 +3951,20 @@ html #home .hero__image.lnj-trailer {
 .lnj-trailer .lnj-tr__out { animation-name: lnj-tr-out; }
 
 .lnj-trailer .lnj-tr__floor { animation-name: lnj-tr-floor; }
-.lnj-trailer .lnj-tr__go { animation-name: lnj-tr-go; }
-.lnj-trailer .lnj-tr__trail { animation-name: lnj-tr-trail; }
-.lnj-trailer .lnj-tr__pitch { animation-name: lnj-tr-pitch; transform-origin: 40% 100%; }
 .lnj-trailer .lnj-tr__drop { animation-name: lnj-tr-drop; }
 .lnj-trailer .lnj-tr__squash { animation-name: lnj-tr-squash; transform-origin: 50% 100%; }
-.lnj-trailer .lnj-tr__spin { animation-name: lnj-tr-spin; }
 .lnj-trailer .lnj-tr__led { animation-name: lnj-tr-led; }
 .lnj-trailer .lnj-tr__scan { animation-name: lnj-tr-scan; }
 
+.lnj-trailer .lnj-tr__wall-hit { animation-name: lnj-tr-wall-hit; }
+.lnj-trailer .lnj-tr__crash { animation-name: lnj-tr-crash; }
+.lnj-trailer .lnj-tr__bonk { animation-name: lnj-tr-bonk; transform-origin: 0% 100%; }
+.lnj-trailer .lnj-tr__wheel { animation-name: lnj-tr-wheel; }
+
+.lnj-trailer .lnj-tr__strike { animation-name: lnj-tr-strike; transform-origin: left center; }
 .lnj-trailer .lnj-tr__cover { transform-origin: right center; }
-.lnj-trailer .lnj-tr__cover--1 { animation-name: lnj-tr-type-1; }
-.lnj-trailer .lnj-tr__cover--3 { animation-name: lnj-tr-type-3; }
-.lnj-trailer .lnj-tr__cur--1 { animation-name: lnj-tr-cur-1; }
-.lnj-trailer .lnj-tr__cur--3 { animation-name: lnj-tr-cur-3; }
+.lnj-trailer .lnj-tr__cover--fix { animation-name: lnj-tr-type-fix; }
+.lnj-trailer .lnj-tr__cur--fix { animation-name: lnj-tr-cur-fix; }
 
 .lnj-trailer .lnj-tr__wall { animation-name: lnj-tr-draw; }
 .lnj-trailer .lnj-tr__halo { animation-name: lnj-tr-fade; }
@@ -3991,20 +3973,6 @@ html #home .hero__image.lnj-trailer {
 .lnj-trailer .lnj-tr__roll { animation-name: lnj-tr-roll; }
 .lnj-trailer .lnj-tr__prog { animation-name: lnj-tr-prog; transform-origin: left center; }
 .lnj-trailer .lnj-tr__play { animation-name: lnj-tr-play; }
-
-/* the arm's joints turn about their pivots (0 0), like the end card's mark */
-.lnj-trailer :is(.lnj-tr__a1, .lnj-tr__q2, .lnj-tr__q3) {
-    transform-box: view-box;
-    transform-origin: 0 0;
-}
-.lnj-trailer .lnj-tr__a1 { animation-name: lnj-tr-a1; }
-.lnj-trailer .lnj-tr__q2 { animation-name: lnj-tr-q2; }
-.lnj-trailer .lnj-tr__q3 { animation-name: lnj-tr-q3; }
-.lnj-trailer .lnj-tr__finger--l { animation-name: lnj-tr-finger-l; }
-.lnj-trailer .lnj-tr__finger--r { animation-name: lnj-tr-finger-r; }
-.lnj-trailer .lnj-tr__cube--floor { animation-name: lnj-tr-cube-floor; }
-.lnj-trailer .lnj-tr__cube--held { animation-name: lnj-tr-cube-held; }
-.lnj-trailer .lnj-tr__cube--placed { animation-name: lnj-tr-cube-placed; }
 
 /* the end card's mark: each part turns about 0 0, the pivot its group is translated to (as on the 404) */
 .lnj-trailer :is(.lnj-tr__mark, .lnj-tr__link, .lnj-tr__jy, .lnj-tr__js, .lnj-tr__jr) {
@@ -4061,15 +4029,13 @@ html #home .hero__image.lnj-trailer {
     66.75%, 100% { opacity: 0; }
 }
 
-@keyframes lnj-tr-blink { 50% { opacity: 0; } }
-
 @keyframes lnj-tr-ping {
     0% { opacity: 0.8; transform: scale(0.3); }
     100% { opacity: 0; transform: scale(1); }
 }
 
-/* 01 Build: the floor rolls out, the wheels drop (a bounce each), then the body (squash), deck and lidar (click);
-   the LED flickers on, the lidar starts scanning, and it pitches back and accelerates out of frame */
+/* 1, parts: the floor rolls out, the wheels drop (a bounce each), then the body (squash), deck and lidar (click);
+   the LED flickers on and the lidar starts scanning (backwards); it stays put, as chapter 2 picks it up there */
 @keyframes lnj-tr-floor {
     0%, 0.83% { transform: scaleX(0); }
     4.17%, 100% { transform: scaleX(1); }
@@ -4104,56 +4070,57 @@ html #home .hero__image.lnj-trailer {
     10.83%, 100% { opacity: 1; }
 }
 
-@keyframes lnj-tr-go {
-    0%, 11.67% { transform: translateX(0); animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
-    15.83%, 100% { transform: translateX(300px); }
+/* 2, first run: the wall pops up (0.2 s); the robot sets off at 0.75 s, speeding up, and hits it at 1.75 s (the
+   wall shakes, a click rings out); it pitches back about its rear foot and recoils, wheels spinning back; the
+   error pops up at 2.65 s */
+@keyframes lnj-tr-crash {
+    0%, 2.5% { transform: translateX(0); animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
+    5.83% { transform: translateX(70px); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+    8.75%, 100% { transform: translateX(-36px); }
 }
 
-@keyframes lnj-tr-spin {
-    0%, 11.67% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
-    15.83%, 100% { transform: rotate(1080deg); }
+@keyframes lnj-tr-wheel {
+    0%, 2.5% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
+    5.83% { transform: rotate(360deg); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+    8.75%, 100% { transform: rotate(180deg); }
 }
 
-@keyframes lnj-tr-pitch {
-    0%, 11.67% { transform: rotate(0deg); }
-    12.92% { transform: rotate(-4deg); }
-    15%, 100% { transform: rotate(0deg); }
+@keyframes lnj-tr-bonk {
+    0%, 5.83% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+    6.67% { transform: rotate(-7deg); }
+    7.92% { transform: rotate(2deg); }
+    8.75%, 100% { transform: rotate(0deg); }
 }
 
-@keyframes lnj-tr-trail {
-    0%, 12.08% { opacity: 0; }
-    13.33%, 100% { opacity: 1; }
+@keyframes lnj-tr-wall-hit {
+    0%, 5.17% { transform: translateX(0); }
+    5.83% { transform: translateX(10px); }
+    6.25% { transform: translateX(-5px); }
+    6.67%, 100% { transform: translateX(0); }
 }
 
-/* 02 Code: a cover in the window's colour shrinks off each command a character at a time (30 and 45 of them),
-   the cursor riding its edge; output lines print whole */
-@keyframes lnj-tr-type-1 {
-    0%, 2.92% { transform: scaleX(1); animation-timing-function: steps(30, end); }
-    5.42%, 66.67% { transform: scaleX(0); }
+/* 3, the fix: the old line is struck through (0.6-1 s), then a cover in the window's colour shrinks off the new
+   one a character at a time (42 of them, 1.125-2.5 s), the cursor riding its edge; output lines print whole */
+@keyframes lnj-tr-strike {
+    0%, 2% { transform: scaleX(0); }
+    3.33%, 66.67% { transform: scaleX(1); }
+    66.75%, 100% { transform: scaleX(0); }
+}
+
+@keyframes lnj-tr-type-fix {
+    0%, 3.75% { transform: scaleX(1); animation-timing-function: steps(42, end); }
+    8.33%, 66.67% { transform: scaleX(0); }
     66.75%, 100% { transform: scaleX(1); }
 }
 
-@keyframes lnj-tr-cur-1 {
-    0%, 2.42% { opacity: 0; transform: translateX(0); }
-    2.5%, 2.92% { opacity: 1; transform: translateX(0); animation-timing-function: steps(30, end); }
-    5.42%, 5.75% { opacity: 1; transform: translateX(420px); }
-    5.83%, 100% { opacity: 0; transform: translateX(420px); }
+@keyframes lnj-tr-cur-fix {
+    0%, 3.25% { opacity: 0; transform: translateX(0); }
+    3.33%, 3.75% { opacity: 1; transform: translateX(0); animation-timing-function: steps(42, end); }
+    8.33%, 9.17% { opacity: 1; transform: translateX(588px); }
+    9.25%, 100% { opacity: 0; transform: translateX(588px); }
 }
 
-@keyframes lnj-tr-type-3 {
-    0%, 6.67% { transform: scaleX(1); animation-timing-function: steps(45, end); }
-    10%, 66.67% { transform: scaleX(0); }
-    66.75%, 100% { transform: scaleX(1); }
-}
-
-@keyframes lnj-tr-cur-3 {
-    0%, 6.17% { opacity: 0; transform: translateX(0); }
-    6.25%, 6.67% { opacity: 1; transform: translateX(0); animation-timing-function: steps(45, end); }
-    10%, 10.75% { opacity: 1; transform: translateX(630px); }
-    10.83%, 100% { opacity: 0; transform: translateX(630px); }
-}
-
-/* 04 Drive: walls draw and their inflation halo fades in, the plan draws (the robot's own drive, 1.875-3.75 s
+/* 4, second run: walls draw and their inflation halo fades in, the plan draws (the robot's own drive, 1.875-3.75 s
    into the chapter, is the animateMotion in the partial: keyTimes 0.5375-0.6 of the loop) */
 @keyframes lnj-tr-draw {
     0%, 1.67% { stroke-dashoffset: 100; }
@@ -4167,7 +4134,7 @@ html #home .hero__image.lnj-trailer {
     66.75%, 100% { stroke-dashoffset: 100; }
 }
 
-/* 05 Share: the play button pops, is pressed and fades as the video starts; the robot rolls, the bar fills */
+/* 5, share: the play button pops, is pressed and fades as the video starts; the robot rolls, the bar fills */
 @keyframes lnj-tr-play {
     0%, 2.5% { opacity: 1; transform: scale(0); animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
     4.17%, 5.5% { opacity: 1; transform: scale(1); }
@@ -4220,70 +4187,6 @@ html #home .hero__image.lnj-trailer {
     7.17% { transform: translateY(-80px) scale(0.97, 1.04); animation-timing-function: cubic-bezier(0.11, 0, 0.5, 0); }
     8.5% { transform: translateY(0) scale(1.05, 0.95); }
     9.33%, 100% { transform: translateY(0) scale(1, 1); }
-}
-
-/* 03 Grab: joint angles (degrees) from inverse kinematics, elbow up, the wrist (q3) keeping the gripper at 90deg
-   (straight down) since a1 + q2 + q3 = 90 at every pose and in between. Poses (chapter time): rest (0-0.75 s), above
-   the cube (1.625 s), down on it (2-2.25 s: the fingers close, it swaps into the gripper at 2.125 s), lift
-   (2.875 s), above the stand (3.375 s), down on it (3.625-3.875 s: it swaps onto the stand at 3.65 s, the fingers
-   open), back to rest (4.5 s) */
-@keyframes lnj-tr-a1 {
-    0%, 2.5% { transform: rotate(-107.06deg); }
-    5.42% { transform: rotate(-42.49deg); }
-    6.67%, 7.5% { transform: rotate(-32.59deg); }
-    9.58% { transform: rotate(-68.87deg); }
-    11.25% { transform: rotate(-86.9deg); }
-    12.08%, 12.92% { transform: rotate(-81.14deg); }
-    15%, 100% { transform: rotate(-107.06deg); }
-}
-
-@keyframes lnj-tr-q2 {
-    0%, 2.5% { transform: rotate(114.22deg); }
-    5.42% { transform: rotate(68.7deg); }
-    6.67%, 7.5% { transform: rotate(71.92deg); }
-    9.58% { transform: rotate(77.86deg); }
-    11.25% { transform: rotate(107.46deg); }
-    12.08%, 12.92% { transform: rotate(116.18deg); }
-    15%, 100% { transform: rotate(114.22deg); }
-}
-
-@keyframes lnj-tr-q3 {
-    0%, 2.5% { transform: rotate(82.84deg); }
-    5.42% { transform: rotate(63.79deg); }
-    6.67%, 7.5% { transform: rotate(50.67deg); }
-    9.58% { transform: rotate(81.01deg); }
-    11.25% { transform: rotate(69.44deg); }
-    12.08%, 12.92% { transform: rotate(54.96deg); }
-    15%, 100% { transform: rotate(82.84deg); }
-}
-
-/* the parallel fingers: open 14 either side, closed on the cube */
-@keyframes lnj-tr-finger-l {
-    0%, 6.83% { transform: translateY(-14px); }
-    7.5%, 12.17% { transform: translateY(0); }
-    12.83%, 100% { transform: translateY(-14px); }
-}
-
-@keyframes lnj-tr-finger-r {
-    0%, 6.83% { transform: translateY(14px); }
-    7.5%, 12.17% { transform: translateY(0); }
-    12.83%, 100% { transform: translateY(14px); }
-}
-
-@keyframes lnj-tr-cube-floor {
-    0%, 7.08% { opacity: 1; }
-    7.09%, 100% { opacity: 0; }
-}
-
-@keyframes lnj-tr-cube-held {
-    0%, 7.08% { opacity: 0; }
-    7.09%, 12.17% { opacity: 1; }
-    12.18%, 100% { opacity: 0; }
-}
-
-@keyframes lnj-tr-cube-placed {
-    0%, 12.17% { opacity: 0; }
-    12.18%, 100% { opacity: 1; }
 }
 
 /* pause / play: a small round icon button in the bottom right corner (shown by the partial's script) */

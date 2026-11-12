@@ -8,6 +8,6 @@ trailer: true  # the hero is the animated channel trailer (layouts/partials/home
 
 # Where creativity meets tech
 
-**Links & Joints Studios** (LnJ) is a one-person robotics workshop run by [Koustav Betal]({{< relref "about" >}}). I build robots, write the tools I wish I'd had while building them, and film the process for [YouTube](https://youtube.com/@linksnjoints).
+**Links & Joints Studios** (LnJ) is an initiative by [Koustav Betal]({{< relref "about" >}}) in efforts to democritise robotics. We build robots, write the tools I wish I'd had while building them, and film the process for [YouTube](https://youtube.com/@linksnjoints).
 
 Everything here is hands-on: [tools]({{< relref "tools" >}}) you can install today, [notes]({{< relref "notes" >}}) from the bench, and step-by-step [docs](https://docs.lnjstudios.com/) for building your own robot.

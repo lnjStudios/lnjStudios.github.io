@@ -4,7 +4,7 @@ description: From a fresh Ubuntu board to a working ROS 2, in one command. Picks
 date: 2026-10-18
 type: post
 categories: [Tools]
-tags: [ros2, installer, bash, ubuntu]
+tags: [ros2, manager, bash, ubuntu]
 stage: stable
 level: beginner
 license: MIT

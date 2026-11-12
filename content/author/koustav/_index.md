@@ -9,7 +9,7 @@ url: /koustav/           # the author page's address (it's the `koustav` term of
 photo: koustav.png          # the profile picture, used as is
 avatar: https://github.com/koustavbetal.png   # the small round picture in post bylines
 role: Robotics Software & Sensor Fusion Engineer
-tagline: I lead embedded and navigation software for autonomous mobile robots, from founding-stage hardware bring-up to full ROS 2 deployment.
+tagline: A Lead Robotics Enginner responsible for turning multitude of sensors and components into a reliable working autonomous machine.
 # the hero buttons and the "Get in touch" row; the first one is the main (filled) button
 contact:
   - {label: Email, url: 'mailto:koustavbetal.official@gmail.com', icon: email}
@@ -17,7 +17,7 @@ contact:
   - {label: GitHub, url: 'https://github.com/koustavbetal', icon: github}
   - {label: WhatsApp, url: 'https://wa.me/917595847937', icon: whatsapp, print: '+91 7595847937'}
 # primary skills: the big chips right under the hero
-core: [ROS 2 · Nav2, C++, Python, Sensor fusion, SLAM, Embedded firmware (ESP32 · STM32)]
+core: [ROS 2 · Nav2, C++ / Python, Sensor fusion, SLAM, Embedded firmware (ESP32 · STM32)]
 experience:
   - role: Lead Robotics Engineer
     org: Soma Specialities Pvt. Ltd.
@@ -26,9 +26,9 @@ experience:
     note: Founding engineering team member · Autonomous industrial floor-cleaning robot
     points:
       - Leading hardware selection, software architecture and motion / navigation software for a commercial autonomous cleaning robot, from the ground up.
-      - Built multi-sensor fusion for obstacle and glass detection (ultrasonic, LiDAR, depth cameras) feeding a custom Nav2 costmap layer, for reliable perception in mixed indoor environments.
+      - Built multi-sensor fusion for obstacle and glass detection (ultrasonic, LiDAR, depth cameras) feeding into Navigation Stack for reliable perception in mixed indoor environments.
       - Implemented the full ROS 2 Nav2 stack (SLAM, auto-localisation, custom path planning) for full-area cleaning routes.
-      - Wrote a C++ multistage mission system orchestrator coordinating coverage, navigation, obstacle avoidance and auto-docking; debugged real-time timing and race conditions across the stack.
+      - Wrote a C++ multistage mission orchestrator co-ordinating coverage, navigation, obstacle avoidance and auto-docking; debugged real-time timing and race conditions across the stack.
       - Fully tuned multiple safety features and made it reliable to a 100% human safe.
   - role: R&D Engineer Intern
     org: Together Solutions Robotics & AI
@@ -66,7 +66,7 @@ skills:
   - {group: Languages, items: [C, C++, Python, Embedded C, MicroPython]}
   - {group: Robotics / ROS, items: [ROS2, Nav2, MoveIt2, SLAM, V-SLAM, motion planning,]}
   - {group: Simulators, items: [Gazebo, CoppeliaSim, MuJoCo (mjlab)]}
-  - {group: Sensor fusion & perception, items: [LiDAR, Ultrasonic, RGBD Camera, stereo vision, IR Camera, Wheel Odometry]}
+  - {group: Sensor fusion & perception, items: [LiDAR, Sonar, IMU, RGBD Camera, IR Camera, Wheel Odometry]}
   - {group: AI / computer vision, items: [PyTorch, TensorFlow, OpenCV, MediaPipe, image segmentation, monocular depth estimation]}
   - {group: Embedded & communication, items: [ESP32, STM32, UART, CAN / CANopen, I2C, SPI, MQTT, Zigbee]}
   - {group: Systems, items: [Linux (Ubuntu), systemd, Git]}
@@ -80,4 +80,4 @@ achievements:
   - Coordinator, IEEE IAS GlobConPT 2022.
 ---
 
-Robotics engineer with hands-on experience leading embedded and navigation software for autonomous mobile robots, from founding-stage hardware bring-up to full ROS 2 deployment. Strong in C++ and Python robotics software, multi-sensor fusion (LiDAR, ultrasonic, depth / IR cameras), embedded firmware on ESP32 and STM32, and serial / field-bus communication (CAN, RS, UART, I2C, SPI). Comfortable getting my hands dirty with system architecture and design, custom firmware, the navigation stack and field debugging.
+Robotics engineer with hands-on experience leading embedded and navigation software stacks for autonomous mobile robots, from founding-stage to full deployment. Strong in C++ and Python robotics software, multi-sensor fusion (LiDAR, ultrasonic, depth / IR cameras), embedded firmware on ESP32 and STM32, and serial / field-bus communication (CAN, RS, UART, I2C, SPI). Comfortable getting my hands dirty with system architecture and design, custom firmware, the navigation stack and field debugging.
